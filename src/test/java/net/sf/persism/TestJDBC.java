@@ -10,9 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
-import static net.sf.persism.NadaPrintStream.out;
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestJDBC {
 
     Connection con;
-    long now;
+    static long now;
     Session session;
 
     @BeforeEach
@@ -33,7 +34,7 @@ public class TestJDBC {
         Class.forName(props.getProperty("database.driver"));
 
         String url = props.getProperty("database.url");
-        out.println(url);
+        System.out.println(url);
 
         con = DriverManager.getConnection(url);
         session = new Session(con);
@@ -47,7 +48,7 @@ public class TestJDBC {
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
         System.out.println("full auto users count: " + fullAutoUsers.size());
 
-// TODO         assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
+        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
 
         out("TIME?");
     }
@@ -116,7 +117,7 @@ public class TestJDBC {
 
     }
 
-    void out(Object text) {
+    static void out(Object text) {
         System.out.println(text + " " + (System.currentTimeMillis() - now));
         now = System.currentTimeMillis();
     }
@@ -283,6 +284,8 @@ public class TestJDBC {
                     """;
             sql = String.format(sql, where);
 
+            System.out.println(sql);
+
             List<Post> posts = new ArrayList<>();
             st = con.prepareStatement(sql);
             rs = st.executeQuery();
@@ -312,6 +315,14 @@ public class TestJDBC {
 
                 posts.add(post);
             }
+            out("stitch 1");
+            Map<Integer, FullAutoUser> userParentMap;
+            userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
+            for (Post post : posts) {
+                FullAutoUser parent = userParentMap.get(post.getOwnerUserId());
+                parent.getPosts().add(post);
+            }
+            out("END stitch 1");
 
             // posts queries users again
             sql = """
@@ -322,6 +333,9 @@ public class TestJDBC {
                     """;
 
             sql = String.format(sql, where);
+
+            System.out.println(sql);
+
             List<User> postUsers = new ArrayList<>();
             st = con.prepareStatement(sql);
             rs = st.executeQuery();
@@ -344,6 +358,14 @@ public class TestJDBC {
 
                 postUsers.add(user);
             }
+            out("stitch 2");
+            Map<Integer, Post> postParentMap;
+            postParentMap = posts.stream().collect(Collectors.toMap(Post::getOwnerUserId, o -> o, (o1, o2) -> o1));
+            for (User postUser : postUsers) {
+                Post post = postParentMap.get(postUser.getId());
+                post.setUser(postUser);
+            }
+            out("END stitch 2");
 
             // votes
             sql = """
@@ -353,6 +375,9 @@ public class TestJDBC {
                     """;
 
             sql = String.format(sql, where);
+
+            System.out.println(sql);
+
             List<Vote> votes = new ArrayList<>();
             st = con.prepareStatement(sql);
             rs = st.executeQuery();
@@ -367,7 +392,17 @@ public class TestJDBC {
 
                 votes.add(vote);
             }
+
+            out("stitch 3");
+            userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
+            for (Vote vote : votes) {
+                FullAutoUser parent = userParentMap.get(vote.getUserId());
+                parent.getVotes().add(vote);
+            }
+            out("END stitch 3");
+
             return users;
         }
     }
+
 }
