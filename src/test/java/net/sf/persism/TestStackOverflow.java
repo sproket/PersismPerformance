@@ -3,18 +3,16 @@ package net.sf.persism;
 
 import net.sf.persism.perf.models.*;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.LogManager;
 import java.util.stream.Collectors;
 
 import static net.sf.persism.NadaPrintStream.out;
@@ -28,17 +26,7 @@ public class TestStackOverflow {
     // https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
     // https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede/2678#2678
 
-    static {
-        InputStream stream = TestStackOverflow.class.getClassLoader().
-                getResourceAsStream("logging.properties");
-        try {
-            LogManager.getLogManager().readConfiguration(stream);
-            //LOGGER= Logger.getLogger(MyClass.class.getName());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static final Log log = Log.getLogger(TestStackOverflow.class);
 
     Connection con;
     Session session;
@@ -108,51 +96,23 @@ public class TestStackOverflow {
     @Test
     public void testAllFullAutoUsers() {
 
-        List<Post> posts;
-
-//        List<User> users = session.query(User.class, where(":id < 1000"));
-//        System.out.println("users count: " + users.size());
-//        out("time?");
-//
-//        out("testAllFullAUTOUsers TIME?");
-//
-//         List<FullUser> fullUsers = session.query(FullUser.class, where(":id < 1000"));
-//
-//        posts = session.query(Post.class, where(":ownerUserId IN (SELECT Id FROM Users WHERE Id < 1000)"));
-//        System.out.println("total posts? FullUser? " + posts.size());
-//
-//        System.out.println("full users count: " + fullUsers.size());
-//
-//        out("testAllFullUsers TIME?");
-//
-//        long result = fullUsers.stream().mapToLong(s -> s.getPosts().size()).sum();
-//        System.out.println("total posts?" + result);
-//
-//        result = fullUsers.stream().mapToLong(s -> s.getVotes().size()).sum();
-//        System.out.println("total votes?" + result);
-
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
-//        posts = session.query(Post.class, where(":ownerUserId IN (SELECT Id FROM Users WHERE Id < 1000)"));
-        //System.out.println("total posts? FullAutoUser? " + posts.size());
         System.out.println("full auto users count: " + fullAutoUsers.size());
-//        fullAutoUsers.stream().forEach(fullAutoUser -> {
-//            var x = fullAutoUser.getPosts().stream().filter(post -> post.getUser() != null).findFirst();
-//            if (x.isPresent()) {
-//                System.out.println("ASS " + x);
-//            }
-//        });
 
-        // why is this nulkl?
-        System.out.println("HUH? " + fullAutoUsers.get(0).getPosts().get(0).getUser());
+        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
 
         out("TIME?");
+    }
+
+    @Test
+    public void testFetchPost() {
 
         Post post = session.fetch(Post.class, params(4));
         System.out.println(post + " " + post.getUser());
         assertNotNull(post);
         assertNotNull(post.getUser());
 
-
+        out("TIME?");
     }
 
     @Test

@@ -1,9 +1,6 @@
 package net.sf.persism;
 
-import net.sf.persism.perf.models.FullUser;
-import net.sf.persism.perf.models.Post;
-import net.sf.persism.perf.models.User;
-import net.sf.persism.perf.models.Vote;
+import net.sf.persism.perf.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,11 +8,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import static net.sf.persism.NadaPrintStream.out;
 import static net.sf.persism.Parameters.params;
+import static net.sf.persism.SQL.where;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +39,61 @@ public class TestJDBC {
         session = new Session(con);
         out("before session");
         out("setup");
+    }
+
+    @Test
+    public void testAllFullAutoUsers() throws Exception {
+
+        List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
+        System.out.println("full auto users count: " + fullAutoUsers.size());
+
+// TODO         assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
+
+        out("TIME?");
+    }
+
+
+    @Test
+    public void testPosts() throws Exception {
+        out("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
+        String sql = """
+                    SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
+                    [CommentCount], [CommunityOwnedDate], [CreationDate], [FavoriteCount], [LastActivityDate], 
+                    [LastEditDate], [LastEditorDisplayName], [LastEditorUserId], [OwnerUserId], [ParentId], 
+                    [PostTypeId], [Score], [Tags], [Title], [ViewCount] FROM [Posts] 
+                    WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)                
+                """;
+
+        List<Post> posts = new ArrayList<>();
+
+        PreparedStatement st = con.prepareStatement(sql);
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            Post post = new Post(
+                    rs.getInt("id"),
+                    rs.getInt("acceptedAnswerId"),
+                    rs.getInt("answerCount"),
+                    rs.getString("body"),
+                    rs.getDate("closedDate"),
+                    rs.getInt("commentCount"),
+                    rs.getDate("communityOwnedDate"),
+                    rs.getDate("creationDate"),
+                    rs.getInt("favoriteCount"),
+                    rs.getDate("lastActivityDate"),
+                    rs.getDate("lastEditDate"),
+                    rs.getString("lastEditorDisplayName"),
+                    rs.getInt("lastEditorUserId"),
+                    rs.getInt("ownerUserId"),
+                    rs.getInt("parentId"),
+                    rs.getInt("postTypeId"),
+                    rs.getInt("score"),
+                    rs.getString("tags"),
+                    rs.getString("title"),
+                    rs.getInt("viewCount")
+            );
+            posts.add(post);
+        }
+        out("testPosts size: " + posts.size());
     }
 
     @Test
@@ -164,5 +218,156 @@ public class TestJDBC {
             return null;
         }
 
+        /*
+        SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],
+        [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
+        FROM [Users]
+        WHERE [Id] < 1000
+
+
+        SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], [CommentCount], [CommunityOwnedDate],
+        [CreationDate], [FavoriteCount], [LastActivityDate], [LastEditDate], [LastEditorDisplayName], [LastEditorUserId],
+        [OwnerUserId], [ParentId], [PostTypeId], [Score], [Tags], [Title], [ViewCount]
+        FROM [Posts]
+        WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
+
+        SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],
+        [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
+        FROM [Users]
+        WHERE [Id] IN (SELECT OwnerUserId FROM Posts WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000))
+
+        SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]
+        FROM [Votes]
+        WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
+
+         */
+        public List<FullAutoUser> query(Class<FullAutoUser> fullAutoUserClass, SQL where) throws Exception {
+
+            List<FullAutoUser> users = new ArrayList<>();
+            String sql = """
+                    SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],\s
+                    [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]\s
+                    FROM [Users]
+                    """;
+            sql += " " + where;
+            System.out.println(sql);
+
+            PreparedStatement st = con.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                FullAutoUser user = new FullAutoUser();
+                user.setId(rs.getInt("id"));
+                user.setAboutMe(rs.getString("aboutMe"));
+                user.setCreationDate(rs.getDate("creationDate"));
+                user.setAccountId(rs.getInt("accountId"));
+                user.setAge(rs.getInt("age"));
+                user.setDisplayName(rs.getString("displayName"));
+                user.setDownVotes(rs.getInt("downVotes"));
+                user.setLocation(rs.getString("location"));
+                user.setEmailHash(rs.getString("emailHash"));
+                user.setLastAccessDate(rs.getDate("lastAccessDate"));
+                user.setReputation(rs.getInt("reputation"));
+                user.setUpVotes(rs.getInt("upVotes"));
+                user.setViews(rs.getInt("views"));
+                user.setWebsiteUrl(rs.getString("websiteUrl"));
+
+                users.add(user);
+            }
+
+            sql = """
+                    SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], [CommentCount], [CommunityOwnedDate],\s
+                    [CreationDate], [FavoriteCount], [LastActivityDate], [LastEditDate], [LastEditorDisplayName], [LastEditorUserId],\s
+                    [OwnerUserId], [ParentId], [PostTypeId], [Score], [Tags], [Title], [ViewCount]\s
+                    FROM [Posts]\s
+                    WHERE [OwnerUserId] IN (SELECT Id FROM Users %s)
+                    """;
+            sql = String.format(sql, where);
+
+            List<Post> posts = new ArrayList<>();
+            st = con.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                Post post = new Post(
+                        rs.getInt("id"),
+                        rs.getInt("acceptedAnswerId"),
+                        rs.getInt("answerCount"),
+                        rs.getString("body"),
+                        rs.getDate("closedDate"),
+                        rs.getInt("commentCount"),
+                        rs.getDate("communityOwnedDate"),
+                        rs.getDate("creationDate"),
+                        rs.getInt("favoriteCount"),
+                        rs.getDate("lastActivityDate"),
+                        rs.getDate("lastEditDate"),
+                        rs.getString("lastEditorDisplayName"),
+                        rs.getInt("lastEditorUserId"),
+                        rs.getInt("ownerUserId"),
+                        rs.getInt("parentId"),
+                        rs.getInt("postTypeId"),
+                        rs.getInt("score"),
+                        rs.getString("tags"),
+                        rs.getString("title"),
+                        rs.getInt("viewCount")
+                );
+
+                posts.add(post);
+            }
+
+            // posts queries users again
+            sql = """
+                    SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],
+                    [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
+                    FROM [Users]
+                    WHERE [Id] IN (SELECT OwnerUserId FROM Posts WHERE [OwnerUserId] IN (SELECT Id FROM Users %s))
+                    """;
+
+            sql = String.format(sql, where);
+            List<User> postUsers = new ArrayList<>();
+            st = con.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setAboutMe(rs.getString("aboutMe"));
+                user.setCreationDate(rs.getDate("creationDate"));
+                user.setAccountId(rs.getInt("accountId"));
+                user.setAge(rs.getInt("age"));
+                user.setDisplayName(rs.getString("displayName"));
+                user.setDownVotes(rs.getInt("downVotes"));
+                user.setLocation(rs.getString("location"));
+                user.setEmailHash(rs.getString("emailHash"));
+                user.setLastAccessDate(rs.getDate("lastAccessDate"));
+                user.setReputation(rs.getInt("reputation"));
+                user.setUpVotes(rs.getInt("upVotes"));
+                user.setViews(rs.getInt("views"));
+                user.setWebsiteUrl(rs.getString("websiteUrl"));
+
+                postUsers.add(user);
+            }
+
+            // votes
+            sql = """
+                    SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]
+                    FROM [Votes]
+                    WHERE [UserId] IN (SELECT Id FROM Users %s)
+                    """;
+
+            sql = String.format(sql, where);
+            List<Vote> votes = new ArrayList<>();
+            st = con.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                Vote vote = new Vote(
+                        rs.getInt("id"),
+                        rs.getInt("postId"),
+                        rs.getInt("userId"),
+                        rs.getInt("bountyAmount"),
+                        rs.getInt("voteTypeId"),
+                        rs.getDate("creationDate"));
+
+                votes.add(vote);
+            }
+            return users;
+        }
     }
 }

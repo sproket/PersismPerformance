@@ -4,6 +4,7 @@ import net.sf.persism.annotations.Join;
 import net.sf.persism.annotations.NotColumn;
 
 import java.sql.Date;
+import java.util.List;
 
 public final class Post {
     private Integer id;
@@ -31,6 +32,14 @@ public final class Post {
     @Join(to=User.class, onProperties = "ownerUserId", toProperties = "id")
     //@NotColumn
     private User user;
+
+    //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
+    @NotColumn
+    private Comment comment;
+
+    //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
+    @NotColumn
+    private List<Comment> comments;
 
     public Post() {
     }
@@ -224,6 +233,22 @@ public final class Post {
 
     public void setViewCount(Integer viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override
