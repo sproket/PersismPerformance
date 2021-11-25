@@ -3,7 +3,6 @@ package net.sf.persism;
 
 import net.sf.persism.perf.models.*;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +17,7 @@ import java.util.stream.Collectors;
 import static net.sf.persism.NadaPrintStream.out;
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestStackOverflow {
 
@@ -102,6 +100,20 @@ public class TestStackOverflow {
         assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
 
         out("TIME?");
+    }
+
+    @Test
+    public void testFetchComments() {
+        System.out.println("testFetchComments?");
+        long now = System.currentTimeMillis();
+
+        // 297267
+        //2677740
+        //61
+        List<UserCommentXref> userCommentXrefs = session.query(UserCommentXref.class, where(":userId = ? and :postId = ?"), params(297267, 2677740));
+        assertNotNull(userCommentXrefs);
+        assertEquals(61, userCommentXrefs.size());
+        System.out.println("TIME? " + (System.currentTimeMillis() - now));
     }
 
     @Test
