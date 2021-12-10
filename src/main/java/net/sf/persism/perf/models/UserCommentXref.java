@@ -5,7 +5,7 @@ import net.sf.persism.annotations.Join;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO THIS CLASS WAS ADDED BY ME
+// TODO THIS CLASS WAS ADDED BY ME to test multi column join
 public final class UserCommentXref  {
 
     private Integer id;

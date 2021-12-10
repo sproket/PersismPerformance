@@ -1,6 +1,7 @@
 package net.sf.persism.perf.models;
 
 import net.sf.persism.annotations.Join;
+import net.sf.persism.annotations.NotColumn;
 import net.sf.persism.annotations.Table;
 
 import java.util.ArrayList;
@@ -31,4 +32,12 @@ public class FullAutoUser extends User {
         this.posts = posts;
     }
 
+
+    @Override
+    public String toString() {
+        return super.toString() + "\nFullAutoUser{" +
+                "votes=" + votes +
+                ", posts=" + posts +
+                '}';
+    }
 }

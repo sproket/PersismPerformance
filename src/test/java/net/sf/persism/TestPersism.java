@@ -9,22 +9,22 @@ import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static net.sf.persism.NadaPrintStream.out;
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestStackOverflow {
+public class TestPersism {
 
     // https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
     // https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede/2678#2678
 
-    private static final Log log = Log.getLogger(TestStackOverflow.class);
+    private static final Log log = Log.getLogger(TestPersism.class);
 
     Connection con;
     Session session;
@@ -32,14 +32,14 @@ public class TestStackOverflow {
 
     @BeforeEach
     public void setup() throws Exception {
-        now = System.currentTimeMillis();
+        now = System.nanoTime();
 
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
         Class.forName(props.getProperty("database.driver"));
 
         String url = props.getProperty("database.url");
-        out.println(url);
+        out(url);
 
         con = DriverManager.getConnection(url);
         out("before session");
@@ -60,7 +60,7 @@ public class TestStackOverflow {
         out("testUserAndVotes " + user);
 
         // select count(*) from votes  where UserId = 4918
-        FullUser fullUser = session.fetch(FullUser.class, params(4918));
+        var fullUser = session.fetch(FullAutoUser.class, params(4918));
         out("time?");
 
         assertNotNull(fullUser);
@@ -75,6 +75,7 @@ public class TestStackOverflow {
     public void testAllFullUsers() {
 // todo test with JDBC
         List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
+        out("full users " + fullUsers.size());
 
         List<Post> posts = session.query(Post.class, where(":ownerUserId IN (SELECT Id FROM Users WHERE Id < 1000)"));
         out("total posts? COW? " + posts.size());
@@ -95,7 +96,24 @@ public class TestStackOverflow {
     public void testAllFullAutoUsers() {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
-        System.out.println("full auto users count: " + fullAutoUsers.size());
+        out("time to q");
+
+        long posts = fullAutoUsers.stream()
+                .map(FullAutoUser::getPosts)
+                .mapToLong(Collection::size)
+                .sum();
+        out("tiome to stream posts");
+
+        long votes = fullAutoUsers.stream()
+                .map(FullAutoUser::getVotes)
+                .mapToLong(Collection::size)
+                .sum();
+
+        out("tiome to stream votes");
+
+        System.out.println("full auto users count: " + fullAutoUsers.size() + " posts: " + posts + " votes: " + votes);
+
+        //.collect(Collectors.toList());
 
         assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
 
@@ -129,6 +147,10 @@ public class TestStackOverflow {
 
     @Test
     public void testQueries() {
+        // this loads ALL data....
+        if (true) {
+            return;
+        }
         now = System.currentTimeMillis();
 
         List<Badge> badges = session.query(Badge.class);
@@ -156,9 +178,20 @@ public class TestStackOverflow {
         out("voteTypes: " + voteTypes.size());
     }
 
+    @Test
+    public void testUsersSingleWithFetch() {
+
+        FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
+        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " " + user);
+    }
+
+
     void out(Object text) {
-        System.out.println(text + " " + (System.currentTimeMillis() - now));
-        now = System.currentTimeMillis();
+        long newNan = (System.nanoTime() - now);
+        long newMil = newNan / 1000000;
+
+        System.out.println("TIME:  " + newNan + " (" + newMil + ") " + text);
+        now = System.nanoTime();
     }
 
 }

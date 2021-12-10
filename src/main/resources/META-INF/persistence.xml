@@ -1,0 +1,19 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.2">
+    <persistence-unit name="persism_perf" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>net.sf.persism.jpa.models.User</class>
+        <class>net.sf.persism.jpa.models.Post</class>
+
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://HOWARD-D-LAPTOP;database=StackOverflow2010;integratedSecurity=true;"/>
+            <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+
+
+    </persistence-unit>
+</persistence>

@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class TestJDBC {
 
     @BeforeEach
     public void setup() throws Exception {
-        now = System.currentTimeMillis();
+        now = System.nanoTime();
 
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
@@ -40,6 +41,27 @@ public class TestJDBC {
         session = new Session(con);
         out("before session");
         out("setup");
+
+        var d1 = LocalDate.now();
+        var d2 = LocalDate.now();
+
+    }
+
+    @Test
+    public void testJunk() {
+        // MOHS47572313 -- for woman add 50 to month
+        var ramq = "MOHS47072313";
+        System.out.println(ramq);
+        var month = ramq.substring(6,8);
+        System.out.println(month);
+        int x = Integer.parseInt(month);
+        x += 50;
+        month = ""+x;
+        ramq = ramq.substring(0,6) + month + ramq.substring(8);
+        System.out.println(ramq);
+
+
+
     }
 
     @Test
@@ -118,8 +140,11 @@ public class TestJDBC {
     }
 
     static void out(Object text) {
-        System.out.println(text + " " + (System.currentTimeMillis() - now));
-        now = System.currentTimeMillis();
+        long newNan = (System.nanoTime() - now);
+        long newMil = newNan / 1000000;
+
+        System.out.println(text + " " + newNan +" (" + newMil + ")");
+        now = System.nanoTime();
     }
 
     static class Session {
@@ -315,14 +340,15 @@ public class TestJDBC {
 
                 posts.add(post);
             }
-            out("stitch 1");
+            out("get posts");
+
             Map<Integer, FullAutoUser> userParentMap;
             userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
             for (Post post : posts) {
                 FullAutoUser parent = userParentMap.get(post.getOwnerUserId());
                 parent.getPosts().add(post);
             }
-            out("END stitch 1");
+            out("stitch 1");
 
             // posts queries users again
             sql = """
@@ -358,14 +384,15 @@ public class TestJDBC {
 
                 postUsers.add(user);
             }
-            out("stitch 2");
+            out("users from posts");
+
             Map<Integer, Post> postParentMap;
             postParentMap = posts.stream().collect(Collectors.toMap(Post::getOwnerUserId, o -> o, (o1, o2) -> o1));
             for (User postUser : postUsers) {
                 Post post = postParentMap.get(postUser.getId());
                 post.setUser(postUser);
             }
-            out("END stitch 2");
+            out("stitch 2");
 
             // votes
             sql = """
@@ -392,14 +419,14 @@ public class TestJDBC {
 
                 votes.add(vote);
             }
+            out("get votes");
 
-            out("stitch 3");
             userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
             for (Vote vote : votes) {
                 FullAutoUser parent = userParentMap.get(vote.getUserId());
                 parent.getVotes().add(vote);
             }
-            out("END stitch 3");
+            out("stitch 3");
 
             return users;
         }

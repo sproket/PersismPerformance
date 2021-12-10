@@ -30,7 +30,6 @@ public final class Post {
 
     // infinite loop if you do FullAutoUser
     @Join(to=User.class, onProperties = "ownerUserId", toProperties = "id")
-    //@NotColumn
     private User user;
 
     //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
@@ -40,6 +39,10 @@ public final class Post {
     //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
     @NotColumn
     private List<Comment> comments;
+
+    // should not work yet MANY TO 1 ONLY ASSIGNS to 1 child record
+    @Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
+    private PostType postType;
 
     public Post() {
     }
@@ -249,6 +252,14 @@ public final class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public PostType getPostType() {
+        return postType;
+    }
+
+    public void setPostType(PostType postType) {
+        this.postType = postType;
     }
 
     @Override
