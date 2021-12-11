@@ -29,7 +29,8 @@ public final class Post {
     private Integer viewCount;
 
     // infinite loop if you do FullAutoUser
-    @Join(to=User.class, onProperties = "ownerUserId", toProperties = "id")
+    //@Join(to=User.class, onProperties = "ownerUserId", toProperties = "id")
+    @NotColumn
     private User user;
 
     //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
@@ -41,7 +42,8 @@ public final class Post {
     private List<Comment> comments;
 
     // should not work yet MANY TO 1 ONLY ASSIGNS to 1 child record
-    @Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
+    //@Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
+    @NotColumn
     private PostType postType;
 
     public Post() {

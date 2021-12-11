@@ -33,6 +33,10 @@ public class User {
     @JoinColumn(name = "UserId")
     private Set<Vote> votes = new HashSet<>();
 
+    @OneToMany()
+    @JoinColumn(name = "UserId")
+    private Set<Badge> badges = new HashSet<>();
+
     public Set<Post> getPosts() {
         return posts;
     }
@@ -47,6 +51,14 @@ public class User {
 
     public void setVotes(Set<Vote> votes) {
         this.votes = votes;
+    }
+
+    public Set<Badge> getBadges() {
+        return badges;
+    }
+
+    public void setBadges(Set<Badge> badges) {
+        this.badges = badges;
     }
 
     public Integer getId() {

@@ -2,6 +2,7 @@ package net.sf.persism;
 
 import net.sf.persism.perf.models.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -47,7 +48,7 @@ public class TestJDBC {
 
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testJunk() {
         // MOHS47572313 -- for woman add 50 to month
         var ramq = "MOHS47072313";
@@ -64,7 +65,7 @@ public class TestJDBC {
 
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testAllFullAutoUsers() throws Exception {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
@@ -76,7 +77,7 @@ public class TestJDBC {
     }
 
 
-    @Test
+    @RepeatedTest(2)
     public void testPosts() throws Exception {
         out("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
         String sql = """
@@ -119,7 +120,7 @@ public class TestJDBC {
         out("testPosts size: " + posts.size());
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testUserAndVotes() throws Exception {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));

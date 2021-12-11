@@ -2,6 +2,7 @@ package net.sf.persism;
 
 import net.sf.persism.models.InventoryAdjustment;
 import net.sf.persism.models.SalesOrder;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -60,7 +61,7 @@ public class TestPerformance {
     }
 
     @Benchmark
-    @Test
+    @RepeatedTest(2)
     public void testPersism() throws Exception {
         setup();
 
@@ -76,7 +77,7 @@ public class TestPerformance {
     }
 
     @Benchmark
-    @Test
+    @RepeatedTest(2)
     public void testPersism2() throws Exception {
         setup();
 
@@ -92,7 +93,7 @@ public class TestPerformance {
     }
 
     @Benchmark
-    @Test
+    @RepeatedTest(2)
     public void testJDBC() throws Exception {
         setup();
 

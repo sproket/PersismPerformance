@@ -16,22 +16,18 @@ public class FullAutoUser extends User {
     @Join(to = Post.class, onProperties = "id", toProperties = "ownerUserId")
     List<Post> posts = new ArrayList<>();
 
+    @Join(to = Badge.class, onProperties = "id", toProperties = "userId")
+    List<Badge> badges = new ArrayList<>();
+
     public List<Vote> getVotes() {
         return votes;
     }
-
-    public void setVotes(List<Vote> votes) {
-        this.votes = votes;
-    }
-
     public List<Post> getPosts() {
         return posts;
     }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
+    public List<Badge> getBadges() {
+        return badges;
     }
-
 
     @Override
     public String toString() {

@@ -4,7 +4,7 @@ package net.sf.persism;
 import net.sf.persism.perf.models.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -52,7 +52,7 @@ public class TestPersism {
         con.close();
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testUserAndVotes() {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
@@ -71,7 +71,7 @@ public class TestPersism {
         assertTrue(fullUser.getPosts().size() > 0);
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testAllFullUsers() {
 // todo test with JDBC
         List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
@@ -92,7 +92,7 @@ public class TestPersism {
         System.out.println("MOIIO");
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testAllFullAutoUsers() {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
@@ -120,7 +120,7 @@ public class TestPersism {
         out("TIME?");
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testFetchComments() {
         System.out.println("testFetchComments?");
         long now = System.currentTimeMillis();
@@ -134,7 +134,7 @@ public class TestPersism {
         System.out.println("TIME? " + (System.currentTimeMillis() - now));
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testFetchPost() {
 
         Post post = session.fetch(Post.class, params(4));
@@ -145,7 +145,7 @@ public class TestPersism {
         out("TIME?");
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testQueries() {
         // this loads ALL data....
         if (true) {
@@ -178,11 +178,11 @@ public class TestPersism {
         out("voteTypes: " + voteTypes.size());
     }
 
-    @Test
+    @RepeatedTest(2)
     public void testUsersSingleWithFetch() {
 
         FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
-        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " " + user);
+        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
     }
 
 
