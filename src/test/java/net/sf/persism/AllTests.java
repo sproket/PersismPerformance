@@ -1,9 +1,20 @@
 package net.sf.persism;
 
-import org.junit.platform.suite.api.SelectClasses;
-import org.junit.platform.suite.api.Suite;
 
-@Suite
-@SelectClasses({TestPersism.class, TestJDBC.class, TestJPA.class})
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 public class AllTests {
+
+    public static Test suite() {
+        TestSuite testSuite = new TestSuite();
+        testSuite.addTestSuite(TestPersism.class);
+        testSuite.addTestSuite(TestJDBC.class);
+        testSuite.addTestSuite(TestJPA.class);
+
+        testSuite.addTestSuite(TestPersism.class);
+        testSuite.addTestSuite(TestJDBC.class);
+        testSuite.addTestSuite(TestJPA.class);
+        return testSuite;
+    }
 }

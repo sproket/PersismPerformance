@@ -2,13 +2,11 @@ package net.sf.persism;
 
 
 import net.sf.persism.perf.models.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +15,9 @@ import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPersism {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestPersism extends BaseTest {
 
     // https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
     // https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede/2678#2678
@@ -28,10 +26,11 @@ public class TestPersism {
 
     Connection con;
     Session session;
-    long now;
 
-    @BeforeEach
-    public void setup() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
         now = System.nanoTime();
 
         Properties props = new Properties();
@@ -47,12 +46,18 @@ public class TestPersism {
         out("setup");
     }
 
-    @AfterEach
-    public void tearDown() throws SQLException {
-        con.close();
+    @Override
+    public void tearDown() throws Exception {
+        try {
+            if (con != null) {
+                con.close();
+            }
+        } finally {
+            super.tearDown();
+        }
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testUserAndVotes() {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
@@ -71,9 +76,9 @@ public class TestPersism {
         assertTrue(fullUser.getPosts().size() > 0);
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testAllFullUsers() {
-// todo test with JDBC
+        // todo test with JDBC
         List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
         out("full users " + fullUsers.size());
 
@@ -92,7 +97,7 @@ public class TestPersism {
         System.out.println("MOIIO");
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testAllFullAutoUsers() {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
@@ -120,7 +125,7 @@ public class TestPersism {
         out("TIME?");
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testFetchComments() {
         System.out.println("testFetchComments?");
         long now = System.currentTimeMillis();
@@ -134,7 +139,7 @@ public class TestPersism {
         System.out.println("TIME? " + (System.currentTimeMillis() - now));
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testFetchPost() {
 
         Post post = session.fetch(Post.class, params(4));
@@ -145,7 +150,13 @@ public class TestPersism {
         out("TIME?");
     }
 
-    @RepeatedTest(2)
+    @Override
+    public void testUsersSingleWithFetch() {
+
+        FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
+        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
+    }
+
     public void testQueries() {
         // this loads ALL data....
         if (true) {
@@ -176,22 +187,6 @@ public class TestPersism {
 
         List<VoteType> voteTypes = session.query(VoteType.class);
         out("voteTypes: " + voteTypes.size());
-    }
-
-    @RepeatedTest(2)
-    public void testUsersSingleWithFetch() {
-
-        FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
-        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
-    }
-
-
-    void out(Object text) {
-        long newNan = (System.nanoTime() - now);
-        long newMil = newNan / 1000000;
-
-        System.out.println("TIME:  " + newNan + " (" + newMil + ") " + text);
-        now = System.nanoTime();
     }
 
 }

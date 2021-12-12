@@ -1,9 +1,8 @@
 package net.sf.persism;
 
 import net.sf.persism.perf.models.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,18 +17,16 @@ import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestJDBC {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestJDBC extends BaseTest {
 
     Connection con;
-    static long now;
     Session session;
 
-    @BeforeEach
-    public void setup() throws Exception {
-        now = System.nanoTime();
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
 
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
@@ -45,27 +42,20 @@ public class TestJDBC {
 
         var d1 = LocalDate.now();
         var d2 = LocalDate.now();
-
     }
 
-    @RepeatedTest(2)
-    public void testJunk() {
-        // MOHS47572313 -- for woman add 50 to month
-        var ramq = "MOHS47072313";
-        System.out.println(ramq);
-        var month = ramq.substring(6,8);
-        System.out.println(month);
-        int x = Integer.parseInt(month);
-        x += 50;
-        month = ""+x;
-        ramq = ramq.substring(0,6) + month + ramq.substring(8);
-        System.out.println(ramq);
-
-
-
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            if (con != null) {
+                con.close();
+            }
+        } finally {
+            super.tearDown();
+        }
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testAllFullAutoUsers() throws Exception {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
@@ -76,8 +66,7 @@ public class TestJDBC {
         out("TIME?");
     }
 
-
-    @RepeatedTest(2)
+    // todo add to overrides
     public void testPosts() throws Exception {
         out("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
         String sql = """
@@ -120,7 +109,7 @@ public class TestJDBC {
         out("testPosts size: " + posts.size());
     }
 
-    @RepeatedTest(2)
+    @Override
     public void testUserAndVotes() throws Exception {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
@@ -140,15 +129,29 @@ public class TestJDBC {
 
     }
 
-    static void out(Object text) {
-        long newNan = (System.nanoTime() - now);
-        long newMil = newNan / 1000000;
+    @Override
+    public void testAllFullUsers() {
 
-        System.out.println(text + " " + newNan +" (" + newMil + ")");
-        now = System.nanoTime();
     }
 
-    static class Session {
+    @Override
+    public void testFetchComments() {
+
+    }
+
+    @Override
+    public void testFetchPost() {
+
+    }
+
+    @Override
+    public void testUsersSingleWithFetch() {
+
+    }
+
+
+    // get rid of this
+    class Session {
         Connection con;
 
         public Session(Connection con) {
@@ -432,5 +435,4 @@ public class TestJDBC {
             return users;
         }
     }
-
 }

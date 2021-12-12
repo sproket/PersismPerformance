@@ -28,9 +28,8 @@ public final class Post {
     private String title;
     private Integer viewCount;
 
-    // infinite loop if you do FullAutoUser
-    //@Join(to=User.class, onProperties = "ownerUserId", toProperties = "id")
-    @NotColumn
+    // infinite loop if you FullAutoUser here. We can't have repeating classes
+    @Join(to = User.class, onProperties = "ownerUserId", toProperties = "id")
     private User user;
 
     //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
