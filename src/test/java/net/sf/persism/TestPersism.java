@@ -2,7 +2,13 @@ package net.sf.persism;
 
 
 import net.sf.persism.perf.models.*;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
@@ -15,18 +21,25 @@ import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
+import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestPersism extends BaseTest {
-
-    // https://www.brentozar.com/archive/2015/10/how-to-download-the-stack-overflow-database-via-bittorrent/
-    // https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede/2678#2678
+public class TestPersism extends BaseTest implements ITests {
 
     private static final Log log = Log.getLogger(TestPersism.class);
+
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            testClassName = description.getClassName();
+            testMethodName = description.getMethodName();
+        }
+    };
 
     Connection con;
     Session session;
 
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -57,7 +70,7 @@ public class TestPersism extends BaseTest {
         }
     }
 
-    @Override
+    @Test
     public void testUserAndVotes() {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
@@ -76,7 +89,7 @@ public class TestPersism extends BaseTest {
         assertTrue(fullUser.getPosts().size() > 0);
     }
 
-    @Override
+    @Test
     public void testAllFullUsers() {
         // todo test with JDBC
         List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
@@ -97,9 +110,9 @@ public class TestPersism extends BaseTest {
         System.out.println("MOIIO");
     }
 
-    @Override
-    public void testAllFullAutoUsers() {
 
+    @Test
+    public void testAllFullAutoUsers() {
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
         out("time to q");
 
@@ -125,7 +138,7 @@ public class TestPersism extends BaseTest {
         out("TIME?");
     }
 
-    @Override
+    @Test
     public void testFetchComments() {
         System.out.println("testFetchComments?");
         long now = System.currentTimeMillis();
@@ -139,7 +152,7 @@ public class TestPersism extends BaseTest {
         System.out.println("TIME? " + (System.currentTimeMillis() - now));
     }
 
-    @Override
+    @Test
     public void testFetchPost() {
 
         Post post = session.fetch(Post.class, params(4));
@@ -150,11 +163,11 @@ public class TestPersism extends BaseTest {
         out("TIME?");
     }
 
-    @Override
+    @Test
     public void testUsersSingleWithFetch() {
 
         FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
-        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
+        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " USERID: " + user.getId());
     }
 
     public void testQueries() {

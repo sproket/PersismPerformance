@@ -1,7 +1,10 @@
 package net.sf.persism;
 
 import net.sf.persism.jpa.models.User;
-import org.junit.FixMethodOrder;
+import org.junit.*;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 
 import javax.persistence.EntityManager;
@@ -11,13 +14,22 @@ import javax.persistence.Query;
 import java.util.List;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestJPA extends BaseTest {
+public class TestJPA extends BaseTest implements ITests {
 
     private static final Log log = Log.getLogger(TestJPA.class);
+
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            testClassName = description.getClassName();
+            testMethodName = description.getMethodName();
+        }
+    };
 
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
 
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -25,14 +37,15 @@ public class TestJPA extends BaseTest {
         entityManager = entityManagerFactory.createEntityManager();
     }
 
+    @After
     @Override
     public void tearDown() throws Exception {
         entityManager.close();
         entityManagerFactory.close();
-        super.tearDown();;
+        super.tearDown();
     }
 
-    @Override
+    @Test
     public void testUserAndVotes() {
         //var q = entityManager.createNativeQuery("select * from [Users] where ID < 1000", User.class);
         var q = entityManager.createQuery("SELECT u FROM User u WHERE u.id < 1000");
@@ -48,21 +61,21 @@ public class TestJPA extends BaseTest {
 
     }
 
-    @Override
+    @Test
     public void testAllFullUsers() {
 
     }
 
-    @Override
+    @Test
     public void testAllFullAutoUsers() {
     }
 
-    @Override
+    @Test
     public void testFetchComments() {
 
     }
 
-    @Override
+    @Test
     public void testFetchPost() {
         long now = System.currentTimeMillis();
 
@@ -79,7 +92,7 @@ public class TestJPA extends BaseTest {
         log.info(user.getPosts());
     }
 
-    @Override
+    @Test
     public void testUsersSingleWithFetch() {
         // ROFL https://stackoverflow.com/questions/30088649/how-to-use-multiple-join-fetch-in-one-jpql-query
         // userid 392

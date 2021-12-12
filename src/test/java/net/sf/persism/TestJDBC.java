@@ -1,7 +1,10 @@
 package net.sf.persism;
 
 import net.sf.persism.perf.models.*;
-import org.junit.FixMethodOrder;
+import org.junit.*;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
@@ -17,13 +20,24 @@ import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.where;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestJDBC extends BaseTest {
+public class TestJDBC extends BaseTest implements ITests {
 
     Connection con;
     Session session;
 
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            testClassName = description.getClassName();
+            testMethodName = description.getMethodName();
+        }
+    };
+
+    @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -44,8 +58,9 @@ public class TestJDBC extends BaseTest {
         var d2 = LocalDate.now();
     }
 
+    @After
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         try {
             if (con != null) {
                 con.close();
@@ -55,7 +70,7 @@ public class TestJDBC extends BaseTest {
         }
     }
 
-    @Override
+    @Test
     public void testAllFullAutoUsers() throws Exception {
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
@@ -109,7 +124,7 @@ public class TestJDBC extends BaseTest {
         out("testPosts size: " + posts.size());
     }
 
-    @Override
+    @Test
     public void testUserAndVotes() throws Exception {
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
@@ -129,22 +144,22 @@ public class TestJDBC extends BaseTest {
 
     }
 
-    @Override
+    @Test
     public void testAllFullUsers() {
 
     }
 
-    @Override
+    @Test
     public void testFetchComments() {
 
     }
 
-    @Override
+    @Test
     public void testFetchPost() {
 
     }
 
-    @Override
+    @Test
     public void testUsersSingleWithFetch() {
 
     }

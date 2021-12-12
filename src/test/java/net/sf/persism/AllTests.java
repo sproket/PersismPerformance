@@ -1,20 +1,18 @@
 package net.sf.persism;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        TestPersism.class,
+        TestJDBC.class,
+        TestJPA.class,
+        TestPersism.class,
+        TestJDBC.class,
+        TestJPA.class,
+})
 public class AllTests {
-
-    public static Test suite() {
-        TestSuite testSuite = new TestSuite();
-        testSuite.addTestSuite(TestPersism.class);
-        testSuite.addTestSuite(TestJDBC.class);
-        testSuite.addTestSuite(TestJPA.class);
-
-        testSuite.addTestSuite(TestPersism.class);
-        testSuite.addTestSuite(TestJDBC.class);
-        testSuite.addTestSuite(TestJPA.class);
-        return testSuite;
-    }
 }
