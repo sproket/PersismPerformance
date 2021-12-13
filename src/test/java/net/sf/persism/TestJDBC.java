@@ -7,11 +7,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.LocalDate;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJDBC extends BaseTest implements ITests {
+
+    private static final Log log = Log.getLogger(TestJDBC.class);
 
     Connection con;
     Session session;
@@ -41,21 +39,20 @@ public class TestJDBC extends BaseTest implements ITests {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        reset();
 
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
         Class.forName(props.getProperty("database.driver"));
 
         String url = props.getProperty("database.url");
-        System.out.println(url);
+        log.info(url);
 
         con = DriverManager.getConnection(url);
-        session = new Session(con);
-        out("before session");
-        out("setup");
+        out("SETUP: get Connection");
 
-        var d1 = LocalDate.now();
-        var d2 = LocalDate.now();
+        session = new Session(con);
+        out("SETUP: get Session");
     }
 
     @After
@@ -72,6 +69,7 @@ public class TestJDBC extends BaseTest implements ITests {
 
     @Test
     public void testAllFullAutoUsers() throws Exception {
+        reset();
 
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
         System.out.println("full auto users count: " + fullAutoUsers.size());
@@ -81,9 +79,10 @@ public class TestJDBC extends BaseTest implements ITests {
         out("TIME?");
     }
 
-    // todo add to overrides
-    public void testPosts() throws Exception {
-        out("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
+    @Test
+    public void testPostsQuery() throws Exception {
+        reset();
+        log.info("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
                     [CommentCount], [CommunityOwnedDate], [CreationDate], [FavoriteCount], [LastActivityDate], 
@@ -126,6 +125,7 @@ public class TestJDBC extends BaseTest implements ITests {
 
     @Test
     public void testUserAndVotes() throws Exception {
+        reset();
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
         assertNotNull(user);
@@ -145,22 +145,62 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
+    public void testGetMultipleResultSets() throws Exception {
+        String sql = """
+                SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],\s
+                [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]\s
+                FROM [Users]\s
+                WHERE [Id] < 1000\s
+                                
+                                
+                SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], [CommentCount], [CommunityOwnedDate],\s
+                [CreationDate], [FavoriteCount], [LastActivityDate], [LastEditDate], [LastEditorDisplayName], [LastEditorUserId],\s
+                [OwnerUserId], [ParentId], [PostTypeId], [Score], [Tags], [Title], [ViewCount]\s
+                FROM [Posts]\s
+                WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
+                                
+                SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]\s
+                FROM [Votes]\s
+                WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
+                                
+                """;
+
+        try (Statement st = con.createStatement()) {
+            int n = 0;
+            st.execute(sql);
+            ResultSet rs = st.getResultSet();
+            System.out.println(rs.getMetaData().getColumnLabel(2));
+            n++;
+            while(st.getMoreResults()) {
+                rs = st.getResultSet();
+                System.out.println(rs.getMetaData().getColumnLabel(2));
+                System.out.println(++n);
+            }
+            System.out.println(n);
+        }
+    }
+
+    @Test
     public void testAllFullUsers() {
+        reset();
 
     }
 
     @Test
     public void testFetchComments() {
+        reset();
 
     }
 
     @Test
     public void testFetchPost() {
+        reset();
 
     }
 
     @Test
     public void testUsersSingleWithFetch() {
+        reset();
 
     }
 

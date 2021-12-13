@@ -1,6 +1,7 @@
 package net.sf.persism;
 
 import net.sf.persism.jpa.models.User;
+import net.sf.persism.perf.models.Post;
 import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -33,8 +34,11 @@ public class TestJPA extends BaseTest implements ITests {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        reset();
         entityManagerFactory = Persistence.createEntityManagerFactory("persism_perf");
         entityManager = entityManagerFactory.createEntityManager();
+
+        out("SETUP: get entityManager");
     }
 
     @After
@@ -47,6 +51,7 @@ public class TestJPA extends BaseTest implements ITests {
 
     @Test
     public void testUserAndVotes() {
+        reset();
         //var q = entityManager.createNativeQuery("select * from [Users] where ID < 1000", User.class);
         var q = entityManager.createQuery("SELECT u FROM User u WHERE u.id < 1000");
 
@@ -63,38 +68,56 @@ public class TestJPA extends BaseTest implements ITests {
 
     @Test
     public void testAllFullUsers() {
+        reset();
 
     }
 
     @Test
     public void testAllFullAutoUsers() {
+        reset();
     }
 
     @Test
     public void testFetchComments() {
+        reset();
 
+    }
+
+    @Test
+    public void testPostsQuery() throws Exception {
+        reset();
+        String sql = """
+                    SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
+                    [CommentCount], [CommunityOwnedDate], [CreationDate], [FavoriteCount], [LastActivityDate], 
+                    [LastEditDate], [LastEditorDisplayName], [LastEditorUserId], [OwnerUserId], [ParentId], 
+                    [PostTypeId], [Score], [Tags], [Title], [ViewCount] FROM [Posts] 
+                    WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)                
+                """;
+        var q = entityManager.createNativeQuery(sql);
+        List<Post> posts = q.getResultList();
+        out("testPosts size: " + posts.size());
     }
 
     @Test
     public void testFetchPost() {
-        long now = System.currentTimeMillis();
+        reset();
 
-        var q = entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.posts WHERE u.id < 1000");
-
-        List<User> users = q.getResultList();
-
-        //log.info(users);
-        log.info(users.size());
-        System.out.println(System.currentTimeMillis() - now);
-
-        User user = users.get(0);
-        log.info("USER 1? : " + user);
-        log.info(user.getPosts());
+//        var q = entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.posts WHERE u.id < 1000");
+//
+//        List<User> users = q.getResultList();
+//
+//        //log.info(users);
+//        log.info(users.size());
+//
+//        User user = users.get(0);
+//        log.info("USER 1? : " + user);
+//        log.info(user.getPosts());
+//        sout("");
     }
 
     @Test
     public void testUsersSingleWithFetch() {
-        // ROFL https://stackoverflow.com/questions/30088649/how-to-use-multiple-join-fetch-in-one-jpql-query
+        reset();
         // userid 392
 
         Query q = entityManager.
@@ -104,7 +127,7 @@ public class TestJPA extends BaseTest implements ITests {
 
         User user = (User) q.getSingleResult();
 
-        //  posts: 391 votes: 122 badges: 144 6869088
+        //  posts: 391 votes: 122 badges: 144 6,869,088 records!
         //User user = users.get(0);
         out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
     }

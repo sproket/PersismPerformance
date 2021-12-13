@@ -14,4 +14,5 @@ public interface ITests {
 
     void testUsersSingleWithFetch() throws Exception;
 
+    void testPostsQuery() throws Exception;
 }

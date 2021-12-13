@@ -1,11 +1,8 @@
 package net.sf.persism;
 
 import net.sf.persism.perf.PerfTest;
-import net.sf.persism.perf.PerfTestResult;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Properties;
 
 public abstract class BaseTest {
@@ -13,9 +10,8 @@ public abstract class BaseTest {
     String testClassName;
     String testMethodName;
 
-    long now;
+    private long now;
 
-    private int currentTestId;
     private Connection con;
     private Session session;
 
@@ -26,12 +22,7 @@ public abstract class BaseTest {
         createTestResultTables();
 
         session = new Session(con);
-        PerfTest perfTest = new PerfTest();
-        perfTest.setDescription("some test..... started");
-        perfTest.setStartTime(LocalDateTime.now());
 
-        session.insert(perfTest);
-        currentTestId = perfTest.getId();
     }
 
     public void tearDown() throws Exception {
@@ -56,8 +47,11 @@ public abstract class BaseTest {
             sql = """
                     CREATE TABLE PerfTests (
                         [ID] [int] IDENTITY(1,1) NOT NULL,
-                        [Description] VARCHAR(1024) NOT NULL,
-                        [StartTime] DATETIME NOT NULL,
+                        [TestClass] VARCHAR(254) NOT NULL,
+                        [TestMethod] VARCHAR(254) NOT NULL,
+                        [TestText] VARCHAR(1024) NOT NULL,
+                        [Timing] [bigint] NOT NULL,
+                        [StartTime] DATETIME default current_timestamp
                     )
                     """;
             st.execute(sql);
@@ -65,18 +59,6 @@ public abstract class BaseTest {
             if (isTableInDatabase("PerfTestResults", con)) {
                 st.execute("DROP TABLE PerfTestResults");
             }
-
-            sql = """
-                    CREATE TABLE PerfTestResults (
-                        [ID] [int] IDENTITY(1,1) NOT NULL,
-                        [TEST_ID] [int] NOT NULL,
-                        [Description] VARCHAR(1024) NOT NULL,
-                        [TEST_CLASS] VARCHAR(254) NOT NULL,
-                        [TEST_METHOD] VARCHAR(254) NOT NULL,
-                        [Timing] [bigint] NOT NULL
-                    )
-                    """;
-            st.execute(sql);
         }
     }
 
@@ -112,22 +94,24 @@ public abstract class BaseTest {
     }
 
 
+    void reset() {
+        now = System.nanoTime();
+    }
+
     void out(Object text) {
         long newNan = (System.nanoTime() - now);
-        long newMil = newNan / 1000000;
+        long newMil = newNan / 1_000_000;
 
-        String desc = "TIME:  " + newNan + " (" + newMil + ") " + text;
-        System.out.println(desc);
-        System.out.println("TEST NAME? " + testClassName + " " + testMethodName);
+        String outText = "TIME:  " + newNan + " (" + newMil + ") " + text;
 
-        PerfTestResult perfTestResult = new PerfTestResult();
-        perfTestResult.setTestId(currentTestId);
-        perfTestResult.setDescription(desc);
-        perfTestResult.setTestClass(testClassName);
-        perfTestResult.setTestMethod(testMethodName);
-        perfTestResult.setTiming(newNan);
-        session.insert(perfTestResult);
+        PerfTest perfTest;
+        perfTest = new PerfTest();
+        perfTest.setTestClass(testClassName);
+        perfTest.setTestMethod(testMethodName);
+        perfTest.setTestText(outText);
+        perfTest.setTiming(newNan);
+        session.insert(perfTest);
 
-        now = System.nanoTime();
+        reset();
     }
 }

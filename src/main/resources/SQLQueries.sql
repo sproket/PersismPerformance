@@ -10,12 +10,7 @@ SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], [CommentCo
 FROM [Posts] 
 WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
 
-SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate], 
-[Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId] 
-FROM [Users] 
-WHERE [Id] IN (SELECT OwnerUserId FROM Posts WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000))
-
-SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate] 
+SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]
 FROM [Votes] 
 WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
 

@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
+import static net.sf.persism.SQL.sql;
 import static net.sf.persism.SQL.where;
 import static org.junit.Assert.*;
 
@@ -44,19 +45,20 @@ public class TestPersism extends BaseTest implements ITests {
     public void setUp() throws Exception {
         super.setUp();
 
-        now = System.nanoTime();
+        reset();
 
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
         Class.forName(props.getProperty("database.driver"));
 
         String url = props.getProperty("database.url");
-        out(url);
+        log.info(url);
 
         con = DriverManager.getConnection(url);
-        out("before session");
+        out("SETUP: get Connection");
+
         session = new Session(con);
-        out("setup");
+        out("SETUP: get Session");
     }
 
     @Override
@@ -72,6 +74,7 @@ public class TestPersism extends BaseTest implements ITests {
 
     @Test
     public void testUserAndVotes() {
+        reset();
         out("testUserAndVotes");
         User user = session.fetch(User.class, params(9));
         assertNotNull(user);
@@ -91,6 +94,7 @@ public class TestPersism extends BaseTest implements ITests {
 
     @Test
     public void testAllFullUsers() {
+        reset();
         // todo test with JDBC
         List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
         out("full users " + fullUsers.size());
@@ -110,9 +114,22 @@ public class TestPersism extends BaseTest implements ITests {
         System.out.println("MOIIO");
     }
 
+    @Test
+    public void testPostsQuery() throws Exception {
+        String sql = """
+                    SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
+                    [CommentCount], [CommunityOwnedDate], [CreationDate], [FavoriteCount], [LastActivityDate], 
+                    [LastEditDate], [LastEditorDisplayName], [LastEditorUserId], [OwnerUserId], [ParentId], 
+                    [PostTypeId], [Score], [Tags], [Title], [ViewCount] FROM [Posts] 
+                    WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)                
+                """;
+        List<Post> posts = session.query(Post.class, sql(sql));
+        out("testPosts size: " + posts.size());
+    }
 
     @Test
     public void testAllFullAutoUsers() {
+        reset();
         List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
         out("time to q");
 
@@ -140,6 +157,7 @@ public class TestPersism extends BaseTest implements ITests {
 
     @Test
     public void testFetchComments() {
+        reset();
         System.out.println("testFetchComments?");
         long now = System.currentTimeMillis();
 
@@ -155,16 +173,18 @@ public class TestPersism extends BaseTest implements ITests {
     @Test
     public void testFetchPost() {
 
+        reset();
         Post post = session.fetch(Post.class, params(4));
         System.out.println(post + " " + post.getUser());
         assertNotNull(post);
         assertNotNull(post.getUser());
 
-        out("TIME?");
+        out("testFetchPost");
     }
 
     @Test
     public void testUsersSingleWithFetch() {
+        reset();
 
         FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
         out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " USERID: " + user.getId());
@@ -175,8 +195,6 @@ public class TestPersism extends BaseTest implements ITests {
         if (true) {
             return;
         }
-        now = System.currentTimeMillis();
-
         List<Badge> badges = session.query(Badge.class);
         out("badges: " + badges.size());
 
