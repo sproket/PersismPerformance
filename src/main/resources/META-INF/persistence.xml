@@ -4,10 +4,16 @@
 
         <class>net.sf.persism.jpa.models.User</class>
         <class>net.sf.persism.jpa.models.Post</class>
+        <class>net.sf.persism.jpa.models.Vote</class>
+        <class>net.sf.persism.jpa.models.Badge</class>
+        <class>net.sf.persism.jpa.models.ExtendedUser</class>
 
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://HOWARD-D-LAPTOP;database=StackOverflow2010;integratedSecurity=true;"/>
+<!--            <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://HOWARD-D-HOME;database=StackOverflow2010;integratedSecurity=false;"/>-->
             <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+<!--            <property name="jakarta.persistence.jdbc.user" value="so" />-->
+<!--            <property name="jakarta.persistence.jdbc.password" value="so" />-->
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect"/>
             <property name="hibernate.show_sql" value="true"/>

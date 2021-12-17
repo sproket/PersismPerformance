@@ -1,12 +1,13 @@
 package net.sf.persism.perf.models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public final class Badge {
     private Integer id;
     private String name;
     private Integer userId;
-    private Date date;
+    private Timestamp date;
 
     public Integer getId() {
         return id;
@@ -32,11 +33,11 @@ public final class Badge {
         this.userId = userId;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 

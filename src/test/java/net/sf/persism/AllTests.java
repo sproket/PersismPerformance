@@ -7,11 +7,14 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TestPersism.class,
         TestJDBC.class,
+        TestPersism.class,
         TestJPA.class,
-        TestPersism.class,
         TestJDBC.class,
+        TestPersism.class,
+        TestJPA.class,
+        TestJDBC.class,
+        TestPersism.class,
         TestJPA.class,
 })
 public class AllTests {

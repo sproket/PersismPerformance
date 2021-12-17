@@ -12,12 +12,7 @@ import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
 import static net.sf.persism.SQL.sql;
@@ -37,8 +32,8 @@ public class TestPersism extends BaseTest implements ITests {
         }
     };
 
-    Connection con;
-    Session session;
+    private Connection con;
+    private Session session;
 
     @Before
     @Override
@@ -47,14 +42,15 @@ public class TestPersism extends BaseTest implements ITests {
 
         reset();
 
-        Properties props = new Properties();
-        props.load(getClass().getResourceAsStream("/datasource.properties"));
-        Class.forName(props.getProperty("database.driver"));
+//        Properties props = new Properties();
+//        props.load(getClass().getResourceAsStream("/datasource.properties"));
+//        Class.forName(props.getProperty("database.driver"));
 
-        String url = props.getProperty("database.url");
-        log.info(url);
-
-        con = DriverManager.getConnection(url);
+//        String url = props.getProperty("database.url");
+//        log.info(url);
+//
+//        con = DriverManager.getConnection(url);
+        con = getConnection();
         out("SETUP: get Connection");
 
         session = new Session(con);
@@ -73,45 +69,26 @@ public class TestPersism extends BaseTest implements ITests {
     }
 
     @Test
-    public void testUserAndVotes() {
+    public void testExtendedUser() {
         reset();
-        out("testUserAndVotes");
-        User user = session.fetch(User.class, params(9));
+
+        ExtendedUser user = session.fetch(ExtendedUser.class, params(4918));
+
+        out("testAllFullUserSingle: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
+
         assertNotNull(user);
-        out("testUserAndVotes " + user);
-
-        // select count(*) from votes  where UserId = 4918
-        var fullUser = session.fetch(FullAutoUser.class, params(4918));
-        out("time?");
-
-        assertNotNull(fullUser);
-        System.out.println(fullUser.getVotes().size());
-        System.out.println(fullUser.getPosts().size());
-
-        assertTrue(fullUser.getVotes().size() > 0);
-        assertTrue(fullUser.getPosts().size() > 0);
+        assertTrue(user.getVotes().size() > 0);
+        assertTrue(user.getPosts().size() > 0);
+        assertTrue(user.getBadges().size() > 0);
     }
 
     @Test
-    public void testAllFullUsers() {
+    public void testExtendedUsers() {
         reset();
-        // todo test with JDBC
-        List<FullUser> fullUsers = session.query(FullUser.class, where("Id < 1000"));
-        out("full users " + fullUsers.size());
 
-        List<Post> posts = session.query(Post.class, where(":ownerUserId IN (SELECT Id FROM Users WHERE Id < 1000)"));
-        out("total posts? COW? " + posts.size());
+        List<ExtendedUser> users = session.query(ExtendedUser.class, where("Id < 1000"));
 
-        Map<Integer, FullUser> userMap = fullUsers.stream().collect(Collectors.toMap(fullUser1 -> fullUser1.getId(), fullUser -> fullUser));
-        out("mapping time");
-
-        for (Post post : posts) {
-            userMap.get(post.getOwnerUserId()).getPosts().add(post);
-        }
-
-        out("assigning time");
-
-        System.out.println("MOIIO");
+        out("testAllFullUsersMulti: users: " + users.size());
     }
 
     @Test
@@ -127,39 +104,37 @@ public class TestPersism extends BaseTest implements ITests {
         out("testPosts size: " + posts.size());
     }
 
-    @Test
-    public void testAllFullAutoUsers() {
-        reset();
-        List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where(":id < 1000"));
-        out("time to q");
-
-        long posts = fullAutoUsers.stream()
-                .map(FullAutoUser::getPosts)
-                .mapToLong(Collection::size)
-                .sum();
-        out("tiome to stream posts");
-
-        long votes = fullAutoUsers.stream()
-                .map(FullAutoUser::getVotes)
-                .mapToLong(Collection::size)
-                .sum();
-
-        out("tiome to stream votes");
-
-        System.out.println("full auto users count: " + fullAutoUsers.size() + " posts: " + posts + " votes: " + votes);
-
-        //.collect(Collectors.toList());
-
-        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
-
-        out("TIME?");
-    }
+//    @Test
+//    public void testAllFullAutoUsers() {
+//        reset();
+//        List<ExtendedUser> fullAutoUsers = session.query(ExtendedUser.class, where(":id < 1000"));
+//        out("time to q");
+//
+//        long posts = fullAutoUsers.stream()
+//                .map(ExtendedUser::getPosts)
+//                .mapToLong(Collection::size)
+//                .sum();
+//        out("tiome to stream posts");
+//
+//        long votes = fullAutoUsers.stream()
+//                .map(ExtendedUser::getVotes)
+//                .mapToLong(Collection::size)
+//                .sum();
+//
+//        out("tiome to stream votes");
+//
+//        System.out.println("full auto users count: " + fullAutoUsers.size() + " posts: " + posts + " votes: " + votes);
+//
+//        //.collect(Collectors.toList());
+//
+//        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
+//
+//        out("TIME?");
+//    }
 
     @Test
     public void testFetchComments() {
         reset();
-        System.out.println("testFetchComments?");
-        long now = System.currentTimeMillis();
 
         // 297267
         //2677740
@@ -167,7 +142,8 @@ public class TestPersism extends BaseTest implements ITests {
         List<UserCommentXref> userCommentXrefs = session.query(UserCommentXref.class, where(":userId = ? and :postId = ?"), params(297267, 2677740));
         assertNotNull(userCommentXrefs);
         assertEquals(61, userCommentXrefs.size());
-        System.out.println("TIME? " + (System.currentTimeMillis() - now));
+
+        out("testFetchComments");
     }
 
     @Test
@@ -182,12 +158,12 @@ public class TestPersism extends BaseTest implements ITests {
         out("testFetchPost");
     }
 
-    @Test
-    public void testUsersSingleWithFetch() {
-        reset();
 
-        FullAutoUser user = session.fetch(FullAutoUser.class, params(392));
-        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " USERID: " + user.getId());
+    @Test
+    public void testQueryAllBadges() throws Exception {
+        reset();
+        List<Badge> badges = session.query(Badge.class, sql("select * from Badges"));
+        out("badges size: " + badges.size());
     }
 
     public void testQueries() {

@@ -1,10 +1,10 @@
 package net.sf.persism.perf.models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public final class Comment {
     private Integer id;
-    private Date creationDate;
+    private Timestamp creationDate;
     private Integer postId;
     private Integer score;
     private String text;
@@ -18,11 +18,11 @@ public final class Comment {
         this.id = id;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
 

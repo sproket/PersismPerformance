@@ -2,17 +2,15 @@ package net.sf.persism;
 
 public interface ITests {
 
-    void testUserAndVotes() throws Exception;
+    void testExtendedUser() throws Exception;
 
-    void testAllFullUsers() throws Exception;
-
-    void testAllFullAutoUsers() throws Exception;
+    void testExtendedUsers() throws Exception;
 
     void testFetchComments() throws Exception;
 
     void testFetchPost() throws Exception;
 
-    void testUsersSingleWithFetch() throws Exception;
-
     void testPostsQuery() throws Exception;
+
+    void testQueryAllBadges() throws Exception;
 }

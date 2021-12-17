@@ -1,14 +1,13 @@
 package net.sf.persism.perf.models;
 
 import net.sf.persism.annotations.Join;
-import net.sf.persism.annotations.NotColumn;
 import net.sf.persism.annotations.Table;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Table("Users")
-public class FullAutoUser extends User {
+public class ExtendedUser extends User {
 
     @Join(to = Vote.class, onProperties = "id", toProperties = "userId")
     List<Vote> votes = new ArrayList<>();
@@ -31,9 +30,10 @@ public class FullAutoUser extends User {
 
     @Override
     public String toString() {
-        return super.toString() + "\nFullAutoUser{" +
+        return super.toString() + "\nExtendedUser{" +
                 "votes=" + votes +
                 ", posts=" + posts +
+                ", badges=" + badges +
                 '}';
     }
 }

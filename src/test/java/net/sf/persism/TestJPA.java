@@ -1,7 +1,8 @@
 package net.sf.persism;
 
-import net.sf.persism.jpa.models.User;
-import net.sf.persism.perf.models.Post;
+import net.sf.persism.jpa.models.Badge;
+import net.sf.persism.jpa.models.ExtendedUser;
+import net.sf.persism.jpa.models.Post;
 import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -13,6 +14,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJPA extends BaseTest implements ITests {
@@ -50,31 +54,28 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testUserAndVotes() {
+    public void testExtendedUser() {
         reset();
-        //var q = entityManager.createNativeQuery("select * from [Users] where ID < 1000", User.class);
-        var q = entityManager.createQuery("SELECT u FROM User u WHERE u.id < 1000");
 
-        List<User> users = q.getResultList();
+        var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = 4918");
 
-        //log.info(users);
-        log.info(users.size());
-        User user = users.get(0);
-        log.info("USER 1? : " + user);
-        log.info(user.getPosts());
-        out("USER 1? : " + user);
+        ExtendedUser user = (ExtendedUser) q.getSingleResult();
+        out("testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
+        assertNotNull(user);
+        assertTrue(user.getVotes().size() > 0);
+        assertTrue(user.getPosts().size() > 0);
+        assertTrue(user.getBadges().size() > 0);
     }
 
     @Test
-    public void testAllFullUsers() {
+    public void testExtendedUsers() {
         reset();
 
-    }
+        var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id < 1000");
+        List<ExtendedUser> users = q.getResultList();
 
-    @Test
-    public void testAllFullAutoUsers() {
-        reset();
+        out("testExtendedUsers: users: " + users.size());
     }
 
     @Test
@@ -116,20 +117,13 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testUsersSingleWithFetch() {
+    public void testQueryAllBadges() throws Exception {
         reset();
-        // userid 392
 
-        Query q = entityManager.
-                createQuery(
-                        //"SELECT u FROM User u JOIN FETCH u.posts JOIN FETCH u.votes JOIN FETCH u.badges WHERE u.id = 392 ");
-                        "SELECT u FROM User u WHERE u.id = 392 ");
+        Query q = entityManager.createNativeQuery("SELECT * FROM Badges");
+        List<Badge> badges = q.getResultList();
 
-        User user = (User) q.getSingleResult();
-
-        //  posts: 391 votes: 122 badges: 144 6,869,088 records!
-        //User user = users.get(0);
-        out("posts: " + user.getPosts().size() + " votes: " + user.getVotes().size() + " badges: " + user.getBadges().size() + " " + user);
+        out("badges size: " + badges.size());
     }
 
 

@@ -11,7 +11,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static net.sf.persism.Parameters.params;
@@ -41,14 +40,15 @@ public class TestJDBC extends BaseTest implements ITests {
         super.setUp();
         reset();
 
-        Properties props = new Properties();
-        props.load(getClass().getResourceAsStream("/datasource.properties"));
-        Class.forName(props.getProperty("database.driver"));
-
-        String url = props.getProperty("database.url");
-        log.info(url);
-
-        con = DriverManager.getConnection(url);
+//        Properties props = new Properties();
+//        props.load(getClass().getResourceAsStream("/datasource.properties"));
+//        Class.forName(props.getProperty("database.driver"));
+//
+//        String url = props.getProperty("database.url");
+//        log.info(url);
+//
+//        con = DriverManager.getConnection(url);
+        con = getConnection();
         out("SETUP: get Connection");
 
         session = new Session(con);
@@ -67,17 +67,17 @@ public class TestJDBC extends BaseTest implements ITests {
         }
     }
 
-    @Test
-    public void testAllFullAutoUsers() throws Exception {
-        reset();
-
-        List<FullAutoUser> fullAutoUsers = session.query(FullAutoUser.class, where("[id] < 1000"));
-        System.out.println("full auto users count: " + fullAutoUsers.size());
-
-        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
-
-        out("TIME?");
-    }
+//    @Test
+//    public void testAllFullAutoUsers() throws Exception {
+//        reset();
+//
+//        List<ExtendedUser> fullAutoUsers = session.query(ExtendedUser.class, where("[id] < 1000"));
+//        System.out.println("full auto users count: " + fullAutoUsers.size());
+//
+//        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
+//
+//        out("TIME?");
+//    }
 
     @Test
     public void testPostsQuery() throws Exception {
@@ -101,13 +101,13 @@ public class TestJDBC extends BaseTest implements ITests {
                     rs.getInt("acceptedAnswerId"),
                     rs.getInt("answerCount"),
                     rs.getString("body"),
-                    rs.getDate("closedDate"),
+                    rs.getTimestamp("closedDate"),
                     rs.getInt("commentCount"),
-                    rs.getDate("communityOwnedDate"),
-                    rs.getDate("creationDate"),
+                    rs.getTimestamp("communityOwnedDate"),
+                    rs.getTimestamp("creationDate"),
                     rs.getInt("favoriteCount"),
-                    rs.getDate("lastActivityDate"),
-                    rs.getDate("lastEditDate"),
+                    rs.getTimestamp("lastActivityDate"),
+                    rs.getTimestamp("lastEditDate"),
                     rs.getString("lastEditorDisplayName"),
                     rs.getInt("lastEditorUserId"),
                     rs.getInt("ownerUserId"),
@@ -124,24 +124,17 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testUserAndVotes() throws Exception {
+    public void testExtendedUser() throws Exception {
         reset();
-        out("testUserAndVotes");
-        User user = session.fetch(User.class, params(9));
+
+        ExtendedUser user = (ExtendedUser) session.fetch(ExtendedUser.class, params(4918));
+
+        out("testAllFullUserSingle: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size() );
+
         assertNotNull(user);
-        out("testUserAndVotes " + user);
-
-        // select count(*) from votes  where UserId = 4918
-        FullUser fullUser = (FullUser) session.fetch(FullUser.class, params(4918));
-        out("time?");
-
-        assertNotNull(fullUser);
-        System.out.println(fullUser.getVotes().size());
-        System.out.println(fullUser.getPosts().size());
-
-        assertTrue(fullUser.getVotes().size() > 0);
-        assertTrue(fullUser.getPosts().size() > 0);
-
+        assertTrue(user.getVotes().size() > 0);
+        assertTrue(user.getPosts().size() > 0);
+        assertTrue(user.getBadges().size() > 0);
     }
 
     @Test
@@ -181,7 +174,7 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testAllFullUsers() {
+    public void testExtendedUsers() {
         reset();
 
     }
@@ -199,11 +192,22 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testUsersSingleWithFetch() {
+    public void testQueryAllBadges() throws Exception {
         reset();
+        PreparedStatement st = con.prepareStatement("SELECT * FROM BADGES");
+        ResultSet rs = st.executeQuery();
+        List<Badge> badges = new ArrayList<>();
+        while (rs.next()) {
+            Badge badge = new Badge();
+            badge.setId(rs.getInt("Id"));
+            badge.setName(rs.getString("Name"));
+            badge.setUserId(rs.getInt("UserId"));
+            badge.setDate(rs.getTimestamp("Date"));
+            badges.add(badge);
+        }
 
+        out("badges size: " + badges.size());
     }
-
 
     // get rid of this
     class Session {
@@ -215,36 +219,36 @@ public class TestJDBC extends BaseTest implements ITests {
 
         public <T extends User> User fetch(Class<T> objectClass, Parameters params) throws Exception {
 
-            boolean fullUser = objectClass.isAssignableFrom(FullUser.class);
+            boolean extendedUser = objectClass.isAssignableFrom(ExtendedUser.class);
 
             PreparedStatement st = con.prepareStatement("SELECT * FROM USERS WHERE ID = ?");
             st.setObject(1, params.get(0));
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 User user;
-                if (fullUser) {
-                    user = new FullUser();
+                if (extendedUser) {
+                    user = new ExtendedUser();
                 } else {
                     user = new User();
                 }
                 user.setId(rs.getInt("id"));
                 user.setAboutMe(rs.getString("aboutMe"));
-                user.setCreationDate(rs.getDate("creationDate"));
+                user.setCreationDate(rs.getTimestamp("creationDate"));
                 user.setAccountId(rs.getInt("accountId"));
                 user.setAge(rs.getInt("age"));
                 user.setDisplayName(rs.getString("displayName"));
                 user.setDownVotes(rs.getInt("downVotes"));
                 user.setLocation(rs.getString("location"));
                 user.setEmailHash(rs.getString("emailHash"));
-                user.setLastAccessDate(rs.getDate("lastAccessDate"));
+                user.setLastAccessDate(rs.getTimestamp("lastAccessDate"));
                 user.setReputation(rs.getInt("reputation"));
                 user.setUpVotes(rs.getInt("upVotes"));
                 user.setViews(rs.getInt("views"));
                 user.setWebsiteUrl(rs.getString("websiteUrl"));
 
-                if (fullUser) {
-                    FullUser fuser = (FullUser) user;
-                    List<Vote> votes = fuser.getVotes();
+                if (extendedUser) {
+                    ExtendedUser extUser = (ExtendedUser) user;
+                    List<Vote> votes = extUser.getVotes();
 
                     st = con.prepareStatement("SELECT * FROM Votes WHERE UserId = ?");
                     st.setObject(1, params.get(0));
@@ -256,12 +260,12 @@ public class TestJDBC extends BaseTest implements ITests {
                                 rs.getInt("userId"),
                                 rs.getInt("bountyAmount"),
                                 rs.getInt("voteTypeId"),
-                                rs.getDate("creationDate"));
+                                rs.getTimestamp("creationDate"));
 
                         votes.add(vote);
                     }
 
-                    List<Post> posts = fuser.getPosts();
+                    List<Post> posts = extUser.getPosts();
 
                     st = con.prepareStatement("SELECT * FROM Posts WHERE OwnerUserId = ?");
                     st.setObject(1, params.get(0));
@@ -272,13 +276,13 @@ public class TestJDBC extends BaseTest implements ITests {
                                 rs.getInt("acceptedAnswerId"),
                                 rs.getInt("answerCount"),
                                 rs.getString("body"),
-                                rs.getDate("closedDate"),
+                                rs.getTimestamp("closedDate"),
                                 rs.getInt("commentCount"),
-                                rs.getDate("communityOwnedDate"),
-                                rs.getDate("creationDate"),
+                                rs.getTimestamp("communityOwnedDate"),
+                                rs.getTimestamp("creationDate"),
                                 rs.getInt("favoriteCount"),
-                                rs.getDate("lastActivityDate"),
-                                rs.getDate("lastEditDate"),
+                                rs.getTimestamp("lastActivityDate"),
+                                rs.getTimestamp("lastEditDate"),
                                 rs.getString("lastEditorDisplayName"),
                                 rs.getInt("lastEditorUserId"),
                                 rs.getInt("ownerUserId"),
@@ -326,9 +330,9 @@ public class TestJDBC extends BaseTest implements ITests {
         WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
 
          */
-        public List<FullAutoUser> query(Class<FullAutoUser> fullAutoUserClass, SQL where) throws Exception {
+        public List<ExtendedUser> query(Class<ExtendedUser> fullAutoUserClass, SQL where) throws Exception {
 
-            List<FullAutoUser> users = new ArrayList<>();
+            List<ExtendedUser> users = new ArrayList<>();
             String sql = """
                     SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],\s
                     [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]\s
@@ -340,17 +344,17 @@ public class TestJDBC extends BaseTest implements ITests {
             PreparedStatement st = con.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                FullAutoUser user = new FullAutoUser();
+                ExtendedUser user = new ExtendedUser();
                 user.setId(rs.getInt("id"));
                 user.setAboutMe(rs.getString("aboutMe"));
-                user.setCreationDate(rs.getDate("creationDate"));
+                user.setCreationDate(rs.getTimestamp("creationDate"));
                 user.setAccountId(rs.getInt("accountId"));
                 user.setAge(rs.getInt("age"));
                 user.setDisplayName(rs.getString("displayName"));
                 user.setDownVotes(rs.getInt("downVotes"));
                 user.setLocation(rs.getString("location"));
                 user.setEmailHash(rs.getString("emailHash"));
-                user.setLastAccessDate(rs.getDate("lastAccessDate"));
+                user.setLastAccessDate(rs.getTimestamp("lastAccessDate"));
                 user.setReputation(rs.getInt("reputation"));
                 user.setUpVotes(rs.getInt("upVotes"));
                 user.setViews(rs.getInt("views"));
@@ -379,13 +383,13 @@ public class TestJDBC extends BaseTest implements ITests {
                         rs.getInt("acceptedAnswerId"),
                         rs.getInt("answerCount"),
                         rs.getString("body"),
-                        rs.getDate("closedDate"),
+                        rs.getTimestamp("closedDate"),
                         rs.getInt("commentCount"),
-                        rs.getDate("communityOwnedDate"),
-                        rs.getDate("creationDate"),
+                        rs.getTimestamp("communityOwnedDate"),
+                        rs.getTimestamp("creationDate"),
                         rs.getInt("favoriteCount"),
-                        rs.getDate("lastActivityDate"),
-                        rs.getDate("lastEditDate"),
+                        rs.getTimestamp("lastActivityDate"),
+                        rs.getTimestamp("lastEditDate"),
                         rs.getString("lastEditorDisplayName"),
                         rs.getInt("lastEditorUserId"),
                         rs.getInt("ownerUserId"),
@@ -401,10 +405,10 @@ public class TestJDBC extends BaseTest implements ITests {
             }
             out("get posts");
 
-            Map<Integer, FullAutoUser> userParentMap;
+            Map<Integer, ExtendedUser> userParentMap;
             userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
             for (Post post : posts) {
-                FullAutoUser parent = userParentMap.get(post.getOwnerUserId());
+                ExtendedUser parent = userParentMap.get(post.getOwnerUserId());
                 parent.getPosts().add(post);
             }
             out("stitch 1");
@@ -428,14 +432,14 @@ public class TestJDBC extends BaseTest implements ITests {
                 User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setAboutMe(rs.getString("aboutMe"));
-                user.setCreationDate(rs.getDate("creationDate"));
+                user.setCreationDate(rs.getTimestamp("creationDate"));
                 user.setAccountId(rs.getInt("accountId"));
                 user.setAge(rs.getInt("age"));
                 user.setDisplayName(rs.getString("displayName"));
                 user.setDownVotes(rs.getInt("downVotes"));
                 user.setLocation(rs.getString("location"));
                 user.setEmailHash(rs.getString("emailHash"));
-                user.setLastAccessDate(rs.getDate("lastAccessDate"));
+                user.setLastAccessDate(rs.getTimestamp("lastAccessDate"));
                 user.setReputation(rs.getInt("reputation"));
                 user.setUpVotes(rs.getInt("upVotes"));
                 user.setViews(rs.getInt("views"));
@@ -474,7 +478,7 @@ public class TestJDBC extends BaseTest implements ITests {
                         rs.getInt("userId"),
                         rs.getInt("bountyAmount"),
                         rs.getInt("voteTypeId"),
-                        rs.getDate("creationDate"));
+                        rs.getTimestamp("creationDate"));
 
                 votes.add(vote);
             }
@@ -482,7 +486,7 @@ public class TestJDBC extends BaseTest implements ITests {
 
             userParentMap = users.stream().collect(Collectors.toMap(User::getId, o -> o, (o1, o2) -> o1));
             for (Vote vote : votes) {
-                FullAutoUser parent = userParentMap.get(vote.getUserId());
+                ExtendedUser parent = userParentMap.get(vote.getUserId());
                 parent.getVotes().add(vote);
             }
             out("stitch 3");

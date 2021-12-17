@@ -1,6 +1,8 @@
 package net.sf.persism.perf.models;
 
 import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 public final class Vote {
     private Integer id;
@@ -8,12 +10,12 @@ public final class Vote {
     private Integer userId;
     private Integer bountyAmount;
     private Integer voteTypeId;
-    private Date creationDate;
+    private Timestamp creationDate;
 
     public Vote() {
     }
 
-    public Vote(Integer id, Integer postId, Integer userId, Integer bountyAmount, Integer voteTypeId, Date creationDate) {
+    public Vote(Integer id, Integer postId, Integer userId, Integer bountyAmount, Integer voteTypeId, Timestamp creationDate) {
         this.id = id;
         this.postId = postId;
         this.userId = userId;
@@ -62,11 +64,11 @@ public final class Vote {
         this.voteTypeId = voteTypeId;
     }
 
-    public Date getCreationDate() {
+    public Timestamp getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
     }
 

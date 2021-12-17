@@ -1,22 +1,24 @@
 package net.sf.persism.perf;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public final class PerfTest {
 
-    private int id;
+    private long id;
     private String testClass;
     private String testMethod;
     private String testText;
     private long timing;
+    private long timingMS;
 
-    private LocalDateTime startTime;
+    private Timestamp startTime;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -28,11 +30,11 @@ public final class PerfTest {
         this.testClass = testClass;
     }
 
-    public LocalDateTime getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
@@ -60,6 +62,14 @@ public final class PerfTest {
         this.timing = timing;
     }
 
+    public long getTimingMS() {
+        return timingMS;
+    }
+
+    public void setTimingMS(long timingMS) {
+        this.timingMS = timingMS;
+    }
+
     @Override
     public String toString() {
         return "PerfTest{" +
@@ -68,6 +78,7 @@ public final class PerfTest {
                 ", testMethod='" + testMethod + '\'' +
                 ", testText='" + testText + '\'' +
                 ", timing=" + timing +
+                ", timingms=" + timingMS +
                 ", startTime=" + startTime +
                 '}';
     }

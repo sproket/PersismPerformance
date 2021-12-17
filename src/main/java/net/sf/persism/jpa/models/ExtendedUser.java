@@ -2,11 +2,16 @@ package net.sf.persism.jpa.models;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+
+
+// https://stackoverflow.com/questions/66339393/fetch-several-onetomany-relations-in-hibernate-opposed-to-ebean-fetch
 
 @Entity
 @Table(name = "Users", schema = "dbo", catalog = "StackOverflow2010")
-public class User {
+public class ExtendedUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -24,6 +29,42 @@ public class User {
     private Integer views;
     private String websiteUrl;
     private Integer accountId;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "OwnerUserId")
+    private Set<Post> posts = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UserId")
+    private Set<Vote> votes = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UserId")
+    private Set<Badge> badges = new HashSet<>();
+
+    public Set<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(Set<Post> posts) {
+        this.posts = posts;
+    }
+
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<Vote> votes) {
+        this.votes = votes;
+    }
+
+    public Set<Badge> getBadges() {
+        return badges;
+    }
+
+    public void setBadges(Set<Badge> badges) {
+        this.badges = badges;
+    }
 
     public Integer getId() {
         return id;
@@ -138,28 +179,11 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(aboutMe, user.aboutMe) && Objects.equals(age, user.age) && Objects.equals(creationDate, user.creationDate) && Objects.equals(displayName, user.displayName) && Objects.equals(downVotes, user.downVotes) && Objects.equals(emailHash, user.emailHash) && Objects.equals(lastAccessDate, user.lastAccessDate) && Objects.equals(location, user.location) && Objects.equals(reputation, user.reputation) && Objects.equals(upVotes, user.upVotes) && Objects.equals(views, user.views) && Objects.equals(websiteUrl, user.websiteUrl) && Objects.equals(accountId, user.accountId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, aboutMe, age, creationDate, displayName, downVotes, emailHash, lastAccessDate, location, reputation, upVotes, views, websiteUrl, accountId);
-    }
-
-    @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", displayName='" + displayName + '\'' +
-                ", location='" + location + '\'' +
-                "}\n";
+        return super.toString() + "\nExtendedUser{" +
+                "votes=" + votes +
+                ", posts=" + posts +
+                ", badges=" + badges +
+                '}';
     }
 }

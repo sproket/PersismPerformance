@@ -1,16 +1,17 @@
 package net.sf.persism.perf.models;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class User {
     private Integer id;
     private String aboutMe;
     private Integer age;
-    private Date creationDate;
+    private Timestamp creationDate;
     private String displayName;
     private Integer downVotes;
     private String emailHash;
-    private Date lastAccessDate;
+    private Timestamp lastAccessDate;
     private String location;
     private Integer reputation;
     private Integer upVotes;
@@ -42,13 +43,6 @@ public class User {
         this.age = age;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
 
     public String getDisplayName() {
         return displayName;
@@ -74,11 +68,19 @@ public class User {
         this.emailHash = emailHash;
     }
 
-    public Date getLastAccessDate() {
+    public Timestamp getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Timestamp getLastAccessDate() {
         return lastAccessDate;
     }
 
-    public void setLastAccessDate(Date lastAccessDate) {
+    public void setLastAccessDate(Timestamp lastAccessDate) {
         this.lastAccessDate = lastAccessDate;
     }
 

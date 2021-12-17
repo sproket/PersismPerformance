@@ -4,6 +4,7 @@ import net.sf.persism.annotations.Join;
 import net.sf.persism.annotations.NotColumn;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 public final class Post {
@@ -11,13 +12,13 @@ public final class Post {
     private Integer acceptedAnswerId;
     private Integer answerCount;
     private String body;
-    private Date closedDate;
+    private Timestamp closedDate;
     private Integer commentCount;
-    private Date communityOwnedDate;
-    private Date creationDate;
+    private Timestamp communityOwnedDate;
+    private Timestamp creationDate;
     private Integer favoriteCount;
-    private Date lastActivityDate;
-    private Date lastEditDate;
+    private Timestamp lastActivityDate;
+    private Timestamp lastEditDate;
     private String lastEditorDisplayName;
     private Integer lastEditorUserId;
     private Integer ownerUserId;
@@ -48,7 +49,7 @@ public final class Post {
     public Post() {
     }
 
-    public Post(Integer id, Integer acceptedAnswerId, Integer answerCount, String body, Date closedDate, Integer commentCount, Date communityOwnedDate, Date creationDate, Integer favoriteCount, Date lastActivityDate, Date lastEditDate, String lastEditorDisplayName, Integer lastEditorUserId, Integer ownerUserId, Integer parentId, Integer postTypeId, Integer score, String tags, String title, Integer viewCount) {
+    public Post(Integer id, Integer acceptedAnswerId, Integer answerCount, String body, Timestamp closedDate, Integer commentCount, Timestamp communityOwnedDate, Timestamp creationDate, Integer favoriteCount, Timestamp lastActivityDate, Timestamp lastEditDate, String lastEditorDisplayName, Integer lastEditorUserId, Integer ownerUserId, Integer parentId, Integer postTypeId, Integer score, String tags, String title, Integer viewCount) {
         this.id = id;
         this.acceptedAnswerId = acceptedAnswerId;
         this.answerCount = answerCount;
@@ -111,14 +112,6 @@ public final class Post {
         this.body = body;
     }
 
-    public Date getClosedDate() {
-        return closedDate;
-    }
-
-    public void setClosedDate(Date closedDate) {
-        this.closedDate = closedDate;
-    }
-
     public Integer getCommentCount() {
         return commentCount;
     }
@@ -127,21 +120,6 @@ public final class Post {
         this.commentCount = commentCount;
     }
 
-    public Date getCommunityOwnedDate() {
-        return communityOwnedDate;
-    }
-
-    public void setCommunityOwnedDate(Date communityOwnedDate) {
-        this.communityOwnedDate = communityOwnedDate;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
 
     public Integer getFavoriteCount() {
         return favoriteCount;
@@ -149,22 +127,6 @@ public final class Post {
 
     public void setFavoriteCount(Integer favoriteCount) {
         this.favoriteCount = favoriteCount;
-    }
-
-    public Date getLastActivityDate() {
-        return lastActivityDate;
-    }
-
-    public void setLastActivityDate(Date lastActivityDate) {
-        this.lastActivityDate = lastActivityDate;
-    }
-
-    public Date getLastEditDate() {
-        return lastEditDate;
-    }
-
-    public void setLastEditDate(Date lastEditDate) {
-        this.lastEditDate = lastEditDate;
     }
 
     public String getLastEditorDisplayName() {
@@ -261,6 +223,46 @@ public final class Post {
 
     public void setPostType(PostType postType) {
         this.postType = postType;
+    }
+
+    public Timestamp getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(Timestamp closedDate) {
+        this.closedDate = closedDate;
+    }
+
+    public Timestamp getCommunityOwnedDate() {
+        return communityOwnedDate;
+    }
+
+    public void setCommunityOwnedDate(Timestamp communityOwnedDate) {
+        this.communityOwnedDate = communityOwnedDate;
+    }
+
+    public Timestamp getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Timestamp getLastActivityDate() {
+        return lastActivityDate;
+    }
+
+    public void setLastActivityDate(Timestamp lastActivityDate) {
+        this.lastActivityDate = lastActivityDate;
+    }
+
+    public Timestamp getLastEditDate() {
+        return lastEditDate;
+    }
+
+    public void setLastEditDate(Timestamp lastEditDate) {
+        this.lastEditDate = lastEditDate;
     }
 
     @Override
