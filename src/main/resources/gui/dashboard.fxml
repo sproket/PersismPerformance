@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.layout.*?>
+<GridPane fx:controller="net.sf.persism.gui.DashboardController"
+          xmlns:fx="http://javafx.com/fxml"
+          alignment="center" hgap="10" vgap="10">
+<!--    <fx:include source="mood.fxml" fx:id="mood" GridPane.columnIndex="1" GridPane.rowIndex="1"/>-->
+<!--    <fx:include source="happy.fxml" fx:id="happy" GridPane.columnIndex="1" GridPane.rowIndex="2"/>-->
+
+    <fx:include source="leaderboard.fxml" fx:id="leaderboard"
+                GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="2"/>
+</GridPane>

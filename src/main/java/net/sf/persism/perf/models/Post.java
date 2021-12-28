@@ -3,7 +3,6 @@ package net.sf.persism.perf.models;
 import net.sf.persism.annotations.Join;
 import net.sf.persism.annotations.NotColumn;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 

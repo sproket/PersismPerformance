@@ -1,9 +1,9 @@
 package net.sf.persism;
 
+import net.sf.persism.perf.Category;
 import net.sf.persism.perf.PerfTest;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.sql.*;
 import java.util.Properties;
 
@@ -15,19 +15,15 @@ public abstract class BaseTest {
     String testMethodName;
 
     private long now;
+    private int startLine;
+    private int endLine;
 
     private Connection con;
     private Session session;
 
-    private static boolean dropAndRecreate = false;
+    private static boolean dropAndRecreate = true;
 
     public void setUp() throws Exception {
-//        String h2Home = createHomeFolder("perf");
-//        String url = "jdbc:h2:" + h2Home + "/perf";
-//
-//        log.info(url);
-//        con = DriverManager.getConnection(url, "sa", "");
-
         con = getConnection();
 
         createTestResultTables();
@@ -57,11 +53,13 @@ public abstract class BaseTest {
             sql = """
                     CREATE TABLE PerfTests (
                         [ID] [int] IDENTITY(1,1) NOT NULL,
+                        Category VARCHAR(20) NOT NULL,
                         TestClass VARCHAR(254) NOT NULL,
                         TestMethod VARCHAR(254) NOT NULL,
                         TestText VARCHAR(1024) NOT NULL,
                         Timing BIGINT NOT NULL,
                         TimingMS BIGINT NOT NULL,
+                        LineCount INT NOT NULL,
                         StartTime DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
                     )
                     """;
@@ -105,30 +103,31 @@ public abstract class BaseTest {
     }
 
 
-    void reset() {
+    void perfStart() {
+        Throwable t = new Throwable("reset");
+        startLine = t.getStackTrace()[1].getLineNumber();
         now = System.nanoTime();
     }
 
-    void out(Object text) {
+    void perfEnd(Category category, Object text) {
         long newNan = (System.nanoTime() - now);
         long newMil = newNan / 1_000_000;
 
-        /*
-        ID  CLASS                       METHOD              MESSAGE                                         TIMING      DateTime                MS
-        199	net.sf.persism.TestPersism	testQueryAllBadges	TIME:  2380753700 (2380) badges size: 1102019	2380753700	2021-12-13 14:12:04.903	2380
-         */
-        String outText = "TIME:  " + newNan + " (" + newMil + ") " + text;
+        Throwable t = new Throwable("out");
+        endLine = t.getStackTrace()[1].getLineNumber();
+
+        String outText = "" + text; // "TIME:  " + newNan + " (" + newMil + ") " +
         System.out.println(outText);
         PerfTest perfTest;
         perfTest = new PerfTest();
+        perfTest.setCategory(category);
         perfTest.setTestClass(testClassName);
         perfTest.setTestMethod(testMethodName);
         perfTest.setTestText(outText);
         perfTest.setTiming(newNan);
         perfTest.setTimingMS(newMil);
+        perfTest.setLineCount(endLine - startLine);
         session.insert(perfTest);
-
-        reset();
     }
 
 

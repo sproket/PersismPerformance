@@ -1,16 +1,17 @@
 package net.sf.persism.perf;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 public final class PerfTest {
 
     private long id;
+    private Category category;
     private String testClass;
     private String testMethod;
     private String testText;
     private long timing;
     private long timingMS;
+    private int lineCount;
 
     private Timestamp startTime;
 
@@ -20,6 +21,14 @@ public final class PerfTest {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getTestClass() {
@@ -70,6 +79,14 @@ public final class PerfTest {
         this.timingMS = timingMS;
     }
 
+    public int getLineCount() {
+        return lineCount;
+    }
+
+    public void setLineCount(int lineCount) {
+        this.lineCount = lineCount;
+    }
+
     @Override
     public String toString() {
         return "PerfTest{" +
@@ -80,6 +97,7 @@ public final class PerfTest {
                 ", timing=" + timing +
                 ", timingms=" + timingMS +
                 ", startTime=" + startTime +
+                ", lineCount=" + lineCount +
                 '}';
     }
 }

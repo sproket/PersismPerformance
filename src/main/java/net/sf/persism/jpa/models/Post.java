@@ -36,13 +36,21 @@ public class Post {
 
     private Integer lastEditorUserId;
 
-    private Integer ownerUserId;
+    //private Integer ownerUserId;
     private Integer parentId;
     private Integer postTypeId;
     private Integer score;
     private String tags;
     private String title;
     private Integer viewCount;
+
+    @OneToOne
+    @JoinColumn(name = "ownerUserId", referencedColumnName = "Id")
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
 
     public Integer getId() {
         return id;
@@ -148,13 +156,13 @@ public class Post {
         this.lastEditorUserId = lastEditorUserId;
     }
 
-    public Integer getOwnerUserId() {
-        return ownerUserId;
-    }
-
-    public void setOwnerUserId(Integer ownerUserId) {
-        this.ownerUserId = ownerUserId;
-    }
+//    public Integer getOwnerUserId() {
+//        return ownerUserId;
+//    }
+//
+//    public void setOwnerUserId(Integer ownerUserId) {
+//        this.ownerUserId = ownerUserId;
+//    }
 
     public Integer getParentId() {
         return parentId;
@@ -203,6 +211,10 @@ public class Post {
         this.viewCount = viewCount;
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -212,12 +224,12 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return Objects.equals(id, post.id) && Objects.equals(acceptedAnswerId, post.acceptedAnswerId) && Objects.equals(answerCount, post.answerCount) && Objects.equals(body, post.body) && Objects.equals(closedDate, post.closedDate) && Objects.equals(commentCount, post.commentCount) && Objects.equals(communityOwnedDate, post.communityOwnedDate) && Objects.equals(creationDate, post.creationDate) && Objects.equals(favoriteCount, post.favoriteCount) && Objects.equals(lastActivityDate, post.lastActivityDate) && Objects.equals(lastEditDate, post.lastEditDate) && Objects.equals(lastEditorDisplayName, post.lastEditorDisplayName) && Objects.equals(lastEditorUserId, post.lastEditorUserId) && Objects.equals(ownerUserId, post.ownerUserId) && Objects.equals(parentId, post.parentId) && Objects.equals(postTypeId, post.postTypeId) && Objects.equals(score, post.score) && Objects.equals(tags, post.tags) && Objects.equals(title, post.title) && Objects.equals(viewCount, post.viewCount);
+        return Objects.equals(id, post.id) && Objects.equals(acceptedAnswerId, post.acceptedAnswerId) && Objects.equals(answerCount, post.answerCount) && Objects.equals(body, post.body) && Objects.equals(closedDate, post.closedDate) && Objects.equals(commentCount, post.commentCount) && Objects.equals(communityOwnedDate, post.communityOwnedDate) && Objects.equals(creationDate, post.creationDate) && Objects.equals(favoriteCount, post.favoriteCount) && Objects.equals(lastActivityDate, post.lastActivityDate) && Objects.equals(lastEditDate, post.lastEditDate) && Objects.equals(lastEditorDisplayName, post.lastEditorDisplayName) && Objects.equals(lastEditorUserId, post.lastEditorUserId) && Objects.equals(parentId, post.parentId) && Objects.equals(postTypeId, post.postTypeId) && Objects.equals(score, post.score) && Objects.equals(tags, post.tags) && Objects.equals(title, post.title) && Objects.equals(viewCount, post.viewCount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, acceptedAnswerId, answerCount, body, closedDate, commentCount, communityOwnedDate, creationDate, favoriteCount, lastActivityDate, lastEditDate, lastEditorDisplayName, lastEditorUserId, ownerUserId, parentId, postTypeId, score, tags, title, viewCount);
+        return Objects.hash(id, acceptedAnswerId, answerCount, body, closedDate, commentCount, communityOwnedDate, creationDate, favoriteCount, lastActivityDate, lastEditDate, lastEditorDisplayName, lastEditorUserId, parentId, postTypeId, score, tags, title, viewCount);
     }
 
     @Override
@@ -226,7 +238,7 @@ public class Post {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", creationDate=" + creationDate +
-                ", ownerUserId=" + ownerUserId +
+                ", ownerUser=" + user +
                 ", parentId=" + parentId +
                 ", postTypeId=" + postTypeId +
                 '}';

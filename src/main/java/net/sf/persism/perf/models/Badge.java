@@ -1,6 +1,5 @@
 package net.sf.persism.perf.models;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public final class Badge {
@@ -8,6 +7,16 @@ public final class Badge {
     private String name;
     private Integer userId;
     private Timestamp date;
+
+    public Badge() {
+    }
+
+    public Badge(Integer id, String name, Integer userId, Timestamp date) {
+        this.id = id;
+        this.name = name;
+        this.userId = userId;
+        this.date = date;
+    }
 
     public Integer getId() {
         return id;
