@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public final class PerfTest {
 
-    private long id;
+    private int id;
     private Category category;
     private String testClass;
     private String testMethod;
@@ -15,11 +15,11 @@ public final class PerfTest {
 
     private Timestamp startTime;
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

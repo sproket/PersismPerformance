@@ -3,18 +3,23 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      spacing="10" alignment="CENTER"
+
       fx:controller="net.sf.persism.gui.LeaderboardController">
-    <TableView fx:id="leaders" prefHeight="1000">
+    <TableView fx:id="leaders" prefHeight="500">
         <columns>
-            <TableColumn text="Twitter Handle" prefWidth="300">
+            <TableColumn text="Test name" prefWidth="200">
                 <cellValueFactory>
-                    <PropertyValueFactory property="twitterHandle"/>
+                    <PropertyValueFactory property="testClass"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn text="Count" prefWidth="180">
+            <TableColumn text="Test method" prefWidth="200">
                 <cellValueFactory>
-                    <PropertyValueFactory property="tweetCount"/>
+                    <PropertyValueFactory property="testMethod"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="time" prefWidth="100" style="-fx-alignment: CENTER-RIGHT">
+                <cellValueFactory>
+                    <PropertyValueFactory property="timingMS"/>
                 </cellValueFactory>
             </TableColumn>
         </columns>
