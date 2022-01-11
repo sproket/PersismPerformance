@@ -4,18 +4,20 @@ import net.sf.persism.annotations.Join;
 import net.sf.persism.annotations.NotColumn;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class Post {
     private Integer id;
     private Integer acceptedAnswerId;
-    private Integer answerCount;
+    private int answerCount;
     private String body;
     private Timestamp closedDate;
-    private Integer commentCount;
+    private int commentCount;
     private Timestamp communityOwnedDate;
     private Timestamp creationDate;
-    private Integer favoriteCount;
+    private int favoriteCount;
     private Timestamp lastActivityDate;
     private Timestamp lastEditDate;
     private String lastEditorDisplayName;
@@ -23,32 +25,26 @@ public final class Post {
     private Integer ownerUserId;
     private Integer parentId;
     private Integer postTypeId;
-    private Integer score;
+    private int score;
     private String tags;
     private String title;
-    private Integer viewCount;
+    private int viewCount;
 
     // infinite loop if you FullAutoUser here. We can't have repeating classes
     @Join(to = User.class, onProperties = "ownerUserId", toProperties = "id")
     private User user;
 
-    //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
-    @NotColumn
-    private Comment comment;
+    @Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
+    private List<Comment> comments = new ArrayList<>();
+    // add 2nd join myComments and allComments?
 
-    //@Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
-    @NotColumn
-    private List<Comment> comments;
-
-    // should not work yet MANY TO 1 ONLY ASSIGNS to 1 child record
-    //@Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
-    @NotColumn
+    @Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
     private PostType postType;
 
     public Post() {
     }
 
-    public Post(Integer id, Integer acceptedAnswerId, Integer answerCount, String body, Timestamp closedDate, Integer commentCount, Timestamp communityOwnedDate, Timestamp creationDate, Integer favoriteCount, Timestamp lastActivityDate, Timestamp lastEditDate, String lastEditorDisplayName, Integer lastEditorUserId, Integer ownerUserId, Integer parentId, Integer postTypeId, Integer score, String tags, String title, Integer viewCount) {
+    public Post(Integer id, Integer acceptedAnswerId, int answerCount, String body, Timestamp closedDate, int commentCount, Timestamp communityOwnedDate, Timestamp creationDate, int favoriteCount, Timestamp lastActivityDate, Timestamp lastEditDate, String lastEditorDisplayName, Integer lastEditorUserId, Integer ownerUserId, Integer parentId, Integer postTypeId, int score, String tags, String title, int viewCount) {
         this.id = id;
         this.acceptedAnswerId = acceptedAnswerId;
         this.answerCount = answerCount;
@@ -95,11 +91,11 @@ public final class Post {
         this.acceptedAnswerId = acceptedAnswerId;
     }
 
-    public Integer getAnswerCount() {
+    public int getAnswerCount() {
         return answerCount;
     }
 
-    public void setAnswerCount(Integer answerCount) {
+    public void setAnswerCount(int answerCount) {
         this.answerCount = answerCount;
     }
 
@@ -111,20 +107,20 @@ public final class Post {
         this.body = body;
     }
 
-    public Integer getCommentCount() {
+    public int getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(Integer commentCount) {
+    public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
     }
 
 
-    public Integer getFavoriteCount() {
+    public int getFavoriteCount() {
         return favoriteCount;
     }
 
-    public void setFavoriteCount(Integer favoriteCount) {
+    public void setFavoriteCount(int favoriteCount) {
         this.favoriteCount = favoriteCount;
     }
 
@@ -168,11 +164,11 @@ public final class Post {
         this.postTypeId = postTypeId;
     }
 
-    public Integer getScore() {
+    public int getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(int score) {
         this.score = score;
     }
 
@@ -192,20 +188,12 @@ public final class Post {
         this.title = title;
     }
 
-    public Integer getViewCount() {
+    public int getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(Integer viewCount) {
+    public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
-    }
-
-    public Comment getComment() {
-        return comment;
-    }
-
-    public void setComment(Comment comment) {
-        this.comment = comment;
     }
 
     public List<Comment> getComments() {
@@ -272,96 +260,13 @@ public final class Post {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        Post posts = (Post) o;
-
-        if (id != null ? !id.equals(posts.id) : posts.id != null) {
-            return false;
-        }
-        if (acceptedAnswerId != null ? !acceptedAnswerId.equals(posts.acceptedAnswerId) : posts.acceptedAnswerId != null) {
-            return false;
-        }
-        if (answerCount != null ? !answerCount.equals(posts.answerCount) : posts.answerCount != null) {
-            return false;
-        }
-        if (body != null ? !body.equals(posts.body) : posts.body != null) {
-            return false;
-        }
-        if (closedDate != null ? !closedDate.equals(posts.closedDate) : posts.closedDate != null) {
-            return false;
-        }
-        if (commentCount != null ? !commentCount.equals(posts.commentCount) : posts.commentCount != null) {
-            return false;
-        }
-        if (communityOwnedDate != null ? !communityOwnedDate.equals(posts.communityOwnedDate) : posts.communityOwnedDate != null) {
-            return false;
-        }
-        if (creationDate != null ? !creationDate.equals(posts.creationDate) : posts.creationDate != null) {
-            return false;
-        }
-        if (favoriteCount != null ? !favoriteCount.equals(posts.favoriteCount) : posts.favoriteCount != null) {
-            return false;
-        }
-        if (lastActivityDate != null ? !lastActivityDate.equals(posts.lastActivityDate) : posts.lastActivityDate != null) {
-            return false;
-        }
-        if (lastEditDate != null ? !lastEditDate.equals(posts.lastEditDate) : posts.lastEditDate != null) {
-            return false;
-        }
-        if (lastEditorDisplayName != null ? !lastEditorDisplayName.equals(posts.lastEditorDisplayName) : posts.lastEditorDisplayName != null) {
-            return false;
-        }
-        if (lastEditorUserId != null ? !lastEditorUserId.equals(posts.lastEditorUserId) : posts.lastEditorUserId != null) {
-            return false;
-        }
-        if (ownerUserId != null ? !ownerUserId.equals(posts.ownerUserId) : posts.ownerUserId != null) {
-            return false;
-        }
-        if (parentId != null ? !parentId.equals(posts.parentId) : posts.parentId != null) {
-            return false;
-        }
-        if (postTypeId != null ? !postTypeId.equals(posts.postTypeId) : posts.postTypeId != null) {
-            return false;
-        }
-        if (score != null ? !score.equals(posts.score) : posts.score != null) {
-            return false;
-        }
-        if (tags != null ? !tags.equals(posts.tags) : posts.tags != null) {
-            return false;
-        }
-        if (title != null ? !title.equals(posts.title) : posts.title != null) {
-            return false;
-        }
-        if (viewCount != null ? !viewCount.equals(posts.viewCount) : posts.viewCount != null) {
-            return false;
-        }
-
-        return true;
+        Post post = (Post) o;
+        return answerCount == post.answerCount && commentCount == post.commentCount && favoriteCount == post.favoriteCount && viewCount == post.viewCount && Objects.equals(id, post.id) && Objects.equals(acceptedAnswerId, post.acceptedAnswerId) && Objects.equals(body, post.body) && Objects.equals(closedDate, post.closedDate) && Objects.equals(communityOwnedDate, post.communityOwnedDate) && Objects.equals(creationDate, post.creationDate) && Objects.equals(lastActivityDate, post.lastActivityDate) && Objects.equals(lastEditDate, post.lastEditDate) && Objects.equals(lastEditorDisplayName, post.lastEditorDisplayName) && Objects.equals(lastEditorUserId, post.lastEditorUserId) && Objects.equals(ownerUserId, post.ownerUserId) && Objects.equals(parentId, post.parentId) && Objects.equals(postTypeId, post.postTypeId) && Objects.equals(score, post.score) && Objects.equals(tags, post.tags) && Objects.equals(title, post.title) && Objects.equals(user, post.user) && Objects.equals(comments, post.comments) && Objects.equals(postType, post.postType);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (acceptedAnswerId != null ? acceptedAnswerId.hashCode() : 0);
-        result = 31 * result + (answerCount != null ? answerCount.hashCode() : 0);
-        result = 31 * result + (body != null ? body.hashCode() : 0);
-        result = 31 * result + (closedDate != null ? closedDate.hashCode() : 0);
-        result = 31 * result + (commentCount != null ? commentCount.hashCode() : 0);
-        result = 31 * result + (communityOwnedDate != null ? communityOwnedDate.hashCode() : 0);
-        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
-        result = 31 * result + (favoriteCount != null ? favoriteCount.hashCode() : 0);
-        result = 31 * result + (lastActivityDate != null ? lastActivityDate.hashCode() : 0);
-        result = 31 * result + (lastEditDate != null ? lastEditDate.hashCode() : 0);
-        result = 31 * result + (lastEditorDisplayName != null ? lastEditorDisplayName.hashCode() : 0);
-        result = 31 * result + (lastEditorUserId != null ? lastEditorUserId.hashCode() : 0);
-        result = 31 * result + (ownerUserId != null ? ownerUserId.hashCode() : 0);
-        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
-        result = 31 * result + (postTypeId != null ? postTypeId.hashCode() : 0);
-        result = 31 * result + (score != null ? score.hashCode() : 0);
-        result = 31 * result + (tags != null ? tags.hashCode() : 0);
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (viewCount != null ? viewCount.hashCode() : 0);
-        return result;
+        return Objects.hash(id, acceptedAnswerId, answerCount, body, closedDate, commentCount, communityOwnedDate, creationDate, favoriteCount, lastActivityDate, lastEditDate, lastEditorDisplayName, lastEditorUserId, ownerUserId, parentId, postTypeId, score, tags, title, viewCount, user, comments, postType);
     }
 
     @Override

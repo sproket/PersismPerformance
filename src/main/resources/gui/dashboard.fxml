@@ -9,9 +9,9 @@
     <left>
         <fx:include source="leaderboard.fxml" fx:id="leaderboard" prefWidth="550"/>
     </left>
-    <right>
+    <center>
         <ScrollPane hbarPolicy="NEVER">
             <VBox fx:id="resultCharts"/>
         </ScrollPane>
-    </right>
+    </center>
 </BorderPane>

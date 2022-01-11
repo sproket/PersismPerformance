@@ -36,7 +36,7 @@ public class DashboardApplication extends Application {
             createChart(testName, controller, list);
         }
 
-        stage.setTitle("Hello!");
+        stage.setTitle("Performance data");
         stage.setScene(scene);
 
         stage.show();
@@ -47,8 +47,8 @@ public class DashboardApplication extends Application {
         xAxis.setTickLength(0);
 
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("MS");
-        LineChart<String, Number> lineChart = new LineChart(xAxis, yAxis);
+        yAxis.setLabel("Milliseconds");
+        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setStyle("-fx-padding: 0;");
         lineChart.setLegendVisible(false);
         lineChart.setTitle(testName);
@@ -58,10 +58,11 @@ public class DashboardApplication extends Application {
                 sorted(Comparator.comparing(PerfTest::getTestClass)).toList();
 
         for (PerfTest perfTest : result) {
-            XYChart.Series series = new XYChart.Series();
-            series.setName(perfTest.getId()+"");
-            ObservableList data = series.getData();
-            data.add(new XYChart.Data<String, Number>(perfTest.getTestClass(), perfTest.getTimingMS()));
+            var series = new XYChart.Series<String, Number>();
+
+            series.setName(perfTest.getId() + "");
+            series.getData().add(new XYChart.Data<>(perfTest.getTestClass() + " (" + perfTest.getLineCount() + ")", perfTest.getTimingMS()));
+
             lineChart.getData().add(series);
         }
         controller.resultCharts.getChildren().add(lineChart);

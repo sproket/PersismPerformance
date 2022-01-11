@@ -2,6 +2,8 @@ package net.sf.persism.jpa.models;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -14,19 +16,19 @@ public class Post {
 
     private Integer acceptedAnswerId;
 
-    private Integer answerCount;
+    private int answerCount;
 
     private String body;
 
     private Date closedDate;
 
-    private Integer commentCount;
+    private int commentCount;
 
     private Date communityOwnedDate;
 
     private Date creationDate;
 
-    private Integer favoriteCount;
+    private int favoriteCount;
 
     private Date lastActivityDate;
 
@@ -39,14 +41,39 @@ public class Post {
     //private Integer ownerUserId;
     private Integer parentId;
     private Integer postTypeId;
-    private Integer score;
+
+    private int score;
     private String tags;
     private String title;
-    private Integer viewCount;
+    private int viewCount;
 
     @OneToOne
     @JoinColumn(name = "ownerUserId", referencedColumnName = "Id")
     private User user;
+
+    @OneToMany
+    @JoinColumn(name = "postid", referencedColumnName = "id")
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "posttypeid", referencedColumnName = "id")
+    private PostType postType;
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public PostType getPostType() {
+        return postType;
+    }
+
+    public void setPostType(PostType postType) {
+        this.postType = postType;
+    }
 
     public User getUser() {
         return user;
@@ -68,13 +95,6 @@ public class Post {
         this.acceptedAnswerId = acceptedAnswerId;
     }
 
-    public Integer getAnswerCount() {
-        return answerCount;
-    }
-
-    public void setAnswerCount(Integer answerCount) {
-        this.answerCount = answerCount;
-    }
 
     public String getBody() {
         return body;
@@ -92,13 +112,6 @@ public class Post {
         this.closedDate = closedDate;
     }
 
-    public Integer getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(Integer commentCount) {
-        this.commentCount = commentCount;
-    }
 
     public Date getCommunityOwnedDate() {
         return communityOwnedDate;
@@ -114,14 +127,6 @@ public class Post {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public Integer getFavoriteCount() {
-        return favoriteCount;
-    }
-
-    public void setFavoriteCount(Integer favoriteCount) {
-        this.favoriteCount = favoriteCount;
     }
 
     public Date getLastActivityDate() {
@@ -180,11 +185,11 @@ public class Post {
         this.postTypeId = postTypeId;
     }
 
-    public Integer getScore() {
+    public int getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(int score) {
         this.score = score;
     }
 
@@ -203,16 +208,41 @@ public class Post {
     public void setTitle(String title) {
         this.title = title;
     }
-    public Integer getViewCount() {
-        return viewCount;
-    }
-
-    public void setViewCount(Integer viewCount) {
-        this.viewCount = viewCount;
-    }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public int getAnswerCount() {
+        return answerCount;
+    }
+
+    public void setAnswerCount(int answerCount) {
+        this.answerCount = answerCount;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public int getFavoriteCount() {
+        return favoriteCount;
+    }
+
+    public void setFavoriteCount(int favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 
     @Override

@@ -30,7 +30,7 @@ public class TestPersism extends BaseTest implements ITests {
     @Rule
     public TestRule watcher = new TestWatcher() {
         protected void starting(Description description) {
-            testClassName = description.getClassName();
+            testClassName = description.getTestClass().getSimpleName();
             testMethodName = description.getMethodName();
         }
     };
@@ -77,13 +77,12 @@ public class TestPersism extends BaseTest implements ITests {
     @Test
     public void testExtendedUsers() {
         perfStart();
-
         List<ExtendedUser> users = session.query(ExtendedUser.class, where("Id < 1000"));
 
         perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
 
         assertTrue(users.size() > 0);
-        ExtendedUser user = users.get(10);
+        ExtendedUser user = users.get(4);
         assertTrue(user.getVotes().size() > 0);
         assertTrue(user.getBadges().size() > 0);
         assertTrue(user.getPosts().size() > 0);
@@ -94,13 +93,17 @@ public class TestPersism extends BaseTest implements ITests {
         AtomicInteger votes = new AtomicInteger();
         AtomicInteger badges = new AtomicInteger();
         AtomicInteger posts = new AtomicInteger();
+        AtomicInteger comments = new AtomicInteger();
         users.forEach(u -> {
             votes.addAndGet(u.getVotes().size());
             badges.addAndGet(u.getBadges().size());
             posts.addAndGet(u.getPosts().size());
+            u.getPosts().forEach( p -> {
+                comments.addAndGet(p.getComments().size());
+            });
         });
 
-        log.info("USERS: " + users.size() + " VOTES: " + votes + " BADGES: " + badges + " POSTS: " + posts);
+        log.info("USERS: " + users.size() + " VOTES: " + votes + " BADGES: " + badges + " POSTS: " + posts + " COMMENTS: " + comments);
     }
 
 
@@ -164,12 +167,14 @@ public class TestPersism extends BaseTest implements ITests {
     public void testFetchPost() {
 
         perfStart();
-        Post post = session.fetch(Post.class, params(4));
-        System.out.println(post + " " + post.getUser());
+        Post post = session.fetch(Post.class, params(4435775));
+        perfEnd(Category.Result, "testFetchPost");
+
         assertNotNull(post);
         assertNotNull(post.getUser());
-
-        perfEnd(Category.Result, "testFetchPost");
+        assertNotNull(post.getPostType());
+        assertEquals("comment count in db? 92?", 92, post.getCommentCount());
+        assertEquals("comment count?", 42, post.getComments().size());
     }
 
 
@@ -179,6 +184,10 @@ public class TestPersism extends BaseTest implements ITests {
         List<Badge> badges = session.query(Badge.class, sql("select * from Badges"));
         perfEnd(Category.Result, "badges size: " + badges.size());
 
+    }
+
+    @Test
+    public void testQueryAllBadgesRecord() throws Exception {
         perfStart();
         List<BadgeRec> BadgeRec = session.query(BadgeRec.class, sql("select * from Badges"));
         perfEnd(Category.Result, "badges rec size: " + BadgeRec.size());

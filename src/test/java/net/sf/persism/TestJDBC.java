@@ -30,7 +30,7 @@ public class TestJDBC extends BaseTest implements ITests {
     @Rule
     public TestRule watcher = new TestWatcher() {
         protected void starting(Description description) {
-            testClassName = description.getClassName();
+            testClassName = description.getTestClass().getSimpleName();
             testMethodName = description.getMethodName();
         }
     };
@@ -495,9 +495,31 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testFetchPost() {
+    public void testFetchPost() throws Exception {
+        // todo test
         perfStart();
+        Post post = new Post();
+        User user;
 
+        PreparedStatement st = con.prepareStatement("SELECT * FROM Posts WHERE ID=?");
+        st.setObject(1, 4);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            post.setId(rs.getInt("id"));
+            post.setCreationDate(rs.getTimestamp("CreationDate"));
+            post.setBody(rs.getString("Body"));
+            post.setPostType(null);
+        }
+
+        post.setUser(null);
+        perfEnd(Category.Result, "testFetchPost");
+
+
+        assertNotNull(post);
+        assertNotNull(post.getUser());
+        assertNotNull(post.getPostType());
+        assertEquals("comment count in db? 92?", 92, post.getCommentCount());
+        assertEquals("comment count?", 42, post.getComments().size());
     }
 
     @Test
@@ -516,5 +538,10 @@ public class TestJDBC extends BaseTest implements ITests {
         }
 
         perfEnd(Category.Result, "badges size: " + badges.size());
+    }
+
+    @Test
+    public void testQueryAllBadgesRecord() throws Exception {
+
     }
 }

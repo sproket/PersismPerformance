@@ -13,4 +13,5 @@ public interface ITests {
     void testPostsQuery() throws Exception;
 
     void testQueryAllBadges() throws Exception;
+    void testQueryAllBadgesRecord() throws Exception;
 }

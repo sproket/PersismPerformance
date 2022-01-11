@@ -47,4 +47,12 @@ public class PostType {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PostType{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

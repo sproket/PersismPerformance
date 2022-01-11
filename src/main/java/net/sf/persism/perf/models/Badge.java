@@ -85,4 +85,14 @@ public final class Badge {
         result = 31 * result + (date != null ? date.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Badge{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", userId=" + userId +
+                ", date=" + date +
+                '}';
+    }
 }

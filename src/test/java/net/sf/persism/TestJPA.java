@@ -17,8 +17,9 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.sf.persism.Parameters.params;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJPA extends BaseTest implements ITests {
@@ -28,7 +29,7 @@ public class TestJPA extends BaseTest implements ITests {
     @Rule
     public TestRule watcher = new TestWatcher() {
         protected void starting(Description description) {
-            testClassName = description.getClassName();
+            testClassName = description.getTestClass().getSimpleName();
             testMethodName = description.getMethodName();
         }
     };
@@ -121,18 +122,15 @@ public class TestJPA extends BaseTest implements ITests {
     @Test
     public void testFetchPost() {
         perfStart();
+        Query q = entityManager.createQuery("SELECT p FROM Post p JOIN FETCH Comment c on p.id = c.postId WHERE p.id = 4435775");
+        Post post = (Post) q.getSingleResult();
+        perfEnd(Category.Result, "testFetchPost");
 
-//        var q = entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.posts WHERE u.id < 1000");
-//
-//        List<User> users = q.getResultList();
-//
-//        //log.info(users);
-//        log.info(users.size());
-//
-//        User user = users.get(0);
-//        log.info("USER 1? : " + user);
-//        log.info(user.getPosts());
-//        sout("");
+        assertNotNull(post);
+        assertNotNull(post.getUser());
+        assertNotNull(post.getPostType());
+        assertEquals("comment count in db? 92?", 92, post.getCommentCount());
+        assertEquals("comment count?", 92, post.getComments().size());
     }
 
     @Test
@@ -145,5 +143,8 @@ public class TestJPA extends BaseTest implements ITests {
         perfEnd(Category.Result, "badges size: " + badges.size());
     }
 
+    @Test
+    public void testQueryAllBadgesRecord() throws Exception {
 
+    }
 }

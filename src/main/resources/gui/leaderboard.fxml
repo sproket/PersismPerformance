@@ -5,21 +5,26 @@
 <VBox xmlns:fx="http://javafx.com/fxml"
 
       fx:controller="net.sf.persism.gui.LeaderboardController">
-    <TableView fx:id="leaders" prefHeight="500">
+    <TableView fx:id="leaders" prefHeight="100000">
         <columns>
-            <TableColumn text="Test name" prefWidth="200">
+            <TableColumn text="Test name" prefWidth="170">
                 <cellValueFactory>
                     <PropertyValueFactory property="testClass"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn text="Test method" prefWidth="200">
+            <TableColumn text="Test method" prefWidth="170">
                 <cellValueFactory>
                     <PropertyValueFactory property="testMethod"/>
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn text="time" prefWidth="100" style="-fx-alignment: CENTER-RIGHT">
+            <TableColumn text="Time (MS)" prefWidth="95" style="-fx-alignment: CENTER-RIGHT">
                 <cellValueFactory>
                     <PropertyValueFactory property="timingMS"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn text="LOC" prefWidth="95" style="-fx-alignment: CENTER-RIGHT">
+                <cellValueFactory>
+                    <PropertyValueFactory property="lineCount"/>
                 </cellValueFactory>
             </TableColumn>
         </columns>
