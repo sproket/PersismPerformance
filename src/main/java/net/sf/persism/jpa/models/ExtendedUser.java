@@ -40,7 +40,6 @@ public class ExtendedUser {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "UserId")
-    // use transient
     private Set<Badge> badges = new HashSet<>();
 
     public Set<Post> getPosts() {

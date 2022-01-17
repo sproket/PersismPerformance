@@ -2,10 +2,16 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextField?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-
       fx:controller="net.sf.persism.gui.LeaderboardController">
-    <TableView fx:id="leaders" prefHeight="100000">
+
+    <HBox spacing="5">
+        <ComboBox fx:id="cbFilter"/> <TextField fx:id="txFilter"/>
+    </HBox>
+    <TableView fx:id="tblResults" prefHeight="100000">
         <columns>
             <TableColumn text="Test name" prefWidth="170">
                 <cellValueFactory>

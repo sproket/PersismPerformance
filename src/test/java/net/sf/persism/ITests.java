@@ -6,12 +6,9 @@ public interface ITests {
 
     void testExtendedUsers() throws Exception;
 
-    void testFetchComments() throws Exception;
+    void testPost() throws Exception;
 
-    void testFetchPost() throws Exception;
-
-    void testPostsQuery() throws Exception;
+    void testPosts() throws Exception;
 
     void testQueryAllBadges() throws Exception;
-    void testQueryAllBadgesRecord() throws Exception;
 }

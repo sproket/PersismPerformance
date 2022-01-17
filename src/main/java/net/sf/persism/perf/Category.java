@@ -1,5 +1,13 @@
 package net.sf.persism.perf;
 
 public enum Category {
-    Setup, Result, Other;
+    Any, Setup, Result, Other;
+
+    @Override
+    public String toString() {
+        if (this == Any) {
+            return "";
+        }
+        return name();
+    }
 }

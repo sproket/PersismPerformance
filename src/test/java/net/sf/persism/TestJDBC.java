@@ -56,22 +56,9 @@ public class TestJDBC extends BaseTest implements ITests {
         }
     }
 
-//    @Test
-//    public void testAllFullAutoUsers() throws Exception {
-//        reset();
-//
-//        List<ExtendedUser> fullAutoUsers = session.query(ExtendedUser.class, where("[id] < 1000"));
-//        System.out.println("full auto users count: " + fullAutoUsers.size());
-//
-//        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
-//
-//        out("TIME?");
-//    }
-
     @Test
-    public void testPostsQuery() throws Exception {
+    public void testPosts() throws Exception {
         perfStart();
-        log.info("testPosts PERSISM TIME: 1315 SIZE: 62710 ");
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
                     [CommentCount], [CommunityOwnedDate], [CreationDate], [FavoriteCount], [LastActivityDate], 
@@ -108,6 +95,8 @@ public class TestJDBC extends BaseTest implements ITests {
                     rs.getInt("viewCount")
             );
             posts.add(post);
+
+            // todo joins....
         }
         perfEnd(Category.Result, "testPosts size: " + posts.size());
     }
@@ -246,14 +235,13 @@ public class TestJDBC extends BaseTest implements ITests {
     public void testExtendedUsers() throws Exception {
 
         perfStart();
-        String where = "WHERE [Id] < 1000";
         List<ExtendedUser> users = new ArrayList<>();
         String sql = """
                 SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],\s
                 [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]\s
                 FROM [Users]
+                WHERE [Id] < 1000
                 """;
-        sql += " " + where;
         System.out.println(sql);
 
         PreparedStatement st = con.prepareStatement(sql);
@@ -283,10 +271,8 @@ public class TestJDBC extends BaseTest implements ITests {
                 [CreationDate], [FavoriteCount], [LastActivityDate], [LastEditDate], [LastEditorDisplayName], [LastEditorUserId],\s
                 [OwnerUserId], [ParentId], [PostTypeId], [Score], [Tags], [Title], [ViewCount]\s
                 FROM [Posts]\s
-                WHERE [OwnerUserId] IN (SELECT Id FROM Users %s)
+                WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
                 """;
-        sql = String.format(sql, where);
-
         System.out.println(sql);
 
         List<Post> posts = new ArrayList<>();
@@ -333,11 +319,8 @@ public class TestJDBC extends BaseTest implements ITests {
                 SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],
                 [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]
                 FROM [Users]
-                WHERE [Id] IN (SELECT OwnerUserId FROM Posts WHERE [OwnerUserId] IN (SELECT Id FROM Users %s))
+                WHERE [Id] IN (SELECT OwnerUserId FROM Posts WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000))
                 """;
-
-        sql = String.format(sql, where);
-
         System.out.println(sql);
 
         List<User> postUsers = new ArrayList<>();
@@ -376,11 +359,8 @@ public class TestJDBC extends BaseTest implements ITests {
         sql = """
                 SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]
                 FROM [Votes]
-                WHERE [UserId] IN (SELECT Id FROM Users %s)
+                WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
                 """;
-
-        sql = String.format(sql, where);
-
         System.out.println(sql);
 
         List<Vote> votes = new ArrayList<>();
@@ -411,11 +391,8 @@ public class TestJDBC extends BaseTest implements ITests {
         sql = """
                 SELECT *
                 FROM [Badges]
-                WHERE [UserId] IN (SELECT Id FROM Users %s)
+                WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
                 """;
-
-        sql = String.format(sql, where);
-
         System.out.println(sql);
 
         List<Badge> badges = new ArrayList<>();
@@ -451,69 +428,89 @@ public class TestJDBC extends BaseTest implements ITests {
         assertEquals(user.getDisplayName(), user.getPosts().get(0).getUser().getDisplayName());
     }
 
-
     @Test
-    public void testGetMultipleResultSets() throws Exception {
-        String sql = """
-                SELECT [Id], [AboutMe], [Age], [CreationDate], [DisplayName], [DownVotes], [EmailHash], [LastAccessDate],\s
-                [Location], [Reputation], [UpVotes], [Views], [WebsiteUrl], [AccountId]\s
-                FROM [Users]\s
-                WHERE [Id] < 1000\s
-                                
-                                
-                SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], [CommentCount], [CommunityOwnedDate],\s
-                [CreationDate], [FavoriteCount], [LastActivityDate], [LastEditDate], [LastEditorDisplayName], [LastEditorUserId],\s
-                [OwnerUserId], [ParentId], [PostTypeId], [Score], [Tags], [Title], [ViewCount]\s
-                FROM [Posts]\s
-                WHERE [OwnerUserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
-                                
-                SELECT [Id], [PostId], [UserId], [BountyAmount], [VoteTypeId], [CreationDate]\s
-                FROM [Votes]\s
-                WHERE [UserId] IN (SELECT Id FROM Users WHERE [Id] < 1000)
-                                
-                """;
-
-        try (Statement st = con.createStatement()) {
-            int n = 0;
-            st.execute(sql);
-            ResultSet rs = st.getResultSet();
-            System.out.println(rs.getMetaData().getColumnLabel(2));
-            n++;
-            while (st.getMoreResults()) {
-                rs = st.getResultSet();
-                System.out.println(rs.getMetaData().getColumnLabel(2));
-                System.out.println(++n);
-            }
-            System.out.println(n);
-        }
-    }
-
-    @Test
-    public void testFetchComments() {
+    public void testPost() throws Exception {
         perfStart();
-
-    }
-
-    @Test
-    public void testFetchPost() throws Exception {
-        // todo test
-        perfStart();
-        Post post = new Post();
-        User user;
-
+        Post post = null;
         PreparedStatement st = con.prepareStatement("SELECT * FROM Posts WHERE ID=?");
-        st.setObject(1, 4);
+        st.setObject(1, 4435775);
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
-            post.setId(rs.getInt("id"));
-            post.setCreationDate(rs.getTimestamp("CreationDate"));
-            post.setBody(rs.getString("Body"));
-            post.setPostType(null);
+            post = new Post(
+                    rs.getInt("id"),
+                    rs.getInt("acceptedAnswerId"),
+                    rs.getInt("answerCount"),
+                    rs.getString("body"),
+                    rs.getTimestamp("closedDate"),
+                    rs.getInt("commentCount"),
+                    rs.getTimestamp("communityOwnedDate"),
+                    rs.getTimestamp("creationDate"),
+                    rs.getInt("favoriteCount"),
+                    rs.getTimestamp("lastActivityDate"),
+                    rs.getTimestamp("lastEditDate"),
+                    rs.getString("lastEditorDisplayName"),
+                    rs.getInt("lastEditorUserId"),
+                    rs.getInt("ownerUserId"),
+                    rs.getInt("parentId"),
+                    rs.getInt("postTypeId"),
+                    rs.getInt("score"),
+                    rs.getString("tags"),
+                    rs.getString("title"),
+                    rs.getInt("viewCount")
+            );
+
+            st = con.prepareStatement("select * from Users where Id = ?");
+            st.setObject(1, post.getOwnerUserId());
+            rs = st.executeQuery();
+            if (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("aboutMe"),
+                        rs.getInt("age"),
+                        rs.getTimestamp("creationDate"),
+                        rs.getString("displayName"),
+                        rs.getInt("downVotes"),
+                        rs.getString("emailHash"),
+                        rs.getTimestamp("lastAccessDate"),
+                        rs.getString("location"),
+                        rs.getInt("reputation"),
+                        rs.getInt("upVotes"),
+                        rs.getInt("views"),
+                        rs.getString("websiteUrl"),
+                        rs.getInt("accountId")
+                );
+                post.setUser(user);
+            }
+
+            st = con.prepareStatement("select * from Comments where PostId = ? and UserId = ?");
+            st.setObject(1, post.getId());
+            st.setObject(2, post.getOwnerUserId());
+            rs = st.executeQuery();
+            post.setComments(new ArrayList<>());
+            while (rs.next()) {
+                Comment comment = new Comment(
+                        rs.getInt("Id"),
+                        rs.getTimestamp("creationDate"),
+                        rs.getInt("postId"),
+                        rs.getInt("score"),
+                        rs.getString("text"),
+                        rs.getInt("userId")
+                );
+                post.getComments().add(comment);
+            }
+
+            st = con.prepareStatement("select * from PostTypes where Id = ?");
+            st.setObject(1, post.getPostTypeId());
+            rs = st.executeQuery();
+            if (rs.next()) {
+                PostType pt = new PostType();
+                pt.setId(rs.getInt("Id"));
+                pt.setType(rs.getString("Type"));
+                post.setPostType(pt);
+            }
+
         }
-
-        post.setUser(null);
         perfEnd(Category.Result, "testFetchPost");
-
 
         assertNotNull(post);
         assertNotNull(post.getUser());
@@ -538,10 +535,5 @@ public class TestJDBC extends BaseTest implements ITests {
         }
 
         perfEnd(Category.Result, "badges size: " + badges.size());
-    }
-
-    @Test
-    public void testQueryAllBadgesRecord() throws Exception {
-
     }
 }

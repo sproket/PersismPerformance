@@ -1,6 +1,7 @@
 package net.sf.persism.jpa.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "Posts", schema = "dbo", catalog = "StackOverflow2010")
-public class Post {
+public class Post implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,15 +48,16 @@ public class Post {
     private String title;
     private int viewCount;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ownerUserId", referencedColumnName = "Id")
     private User user;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "postid", referencedColumnName = "id")
+    @JoinColumn(name = "userid", referencedColumnName = "ownerUserId")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "posttypeid", referencedColumnName = "id")
     private PostType postType;
 

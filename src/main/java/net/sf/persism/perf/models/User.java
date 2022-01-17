@@ -18,6 +18,26 @@ public class User {
     private String websiteUrl;
     private Integer accountId;
 
+    public User() {
+    }
+
+    public User(Integer id, String aboutMe, Integer age, Timestamp creationDate, String displayName, Integer downVotes, String emailHash, Timestamp lastAccessDate, String location, Integer reputation, Integer upVotes, Integer views, String websiteUrl, Integer accountId) {
+        this.id = id;
+        this.aboutMe = aboutMe;
+        this.age = age;
+        this.creationDate = creationDate;
+        this.displayName = displayName;
+        this.downVotes = downVotes;
+        this.emailHash = emailHash;
+        this.lastAccessDate = lastAccessDate;
+        this.location = location;
+        this.reputation = reputation;
+        this.upVotes = upVotes;
+        this.views = views;
+        this.websiteUrl = websiteUrl;
+        this.accountId = accountId;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -11,3 +11,8 @@ https://vladmihalcea.com/n-plus-1-query-problem/
 
 https://stackoverflow.com/questions/30088649/how-to-use-multiple-join-fetch-in-one-jpql-query
 
+
+
+https://www.reddit.com/r/SQL/comments/s1jjo4/why_give_a_talk_at_a_postgres_conference/
+https://www.reddit.com/r/java/comments/s1jg8t/event_c4p_last_day_of_typeville_conference_call/
+https://www.pgcon.org/2022/papers.php

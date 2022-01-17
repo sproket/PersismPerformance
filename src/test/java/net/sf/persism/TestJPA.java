@@ -17,9 +17,7 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.sf.persism.Parameters.params;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestJPA extends BaseTest implements ITests {
@@ -44,6 +42,8 @@ public class TestJPA extends BaseTest implements ITests {
         perfStart();
         entityManagerFactory = Persistence.createEntityManagerFactory("persism_perf");
         entityManager = entityManagerFactory.createEntityManager();
+        var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = -1");
+        q.getSingleResult();
         perfEnd(Category.Setup, "SETUP: get entityManager");
     }
 
@@ -58,9 +58,7 @@ public class TestJPA extends BaseTest implements ITests {
     @Test
     public void testExtendedUser() {
         perfStart();
-
         var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = 4918");
-
         ExtendedUser user = (ExtendedUser) q.getSingleResult();
         perfEnd(Category.Result, "testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
@@ -73,10 +71,8 @@ public class TestJPA extends BaseTest implements ITests {
     @Test
     public void testExtendedUsers() {
         perfStart();
-
         var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id < 1000");
         List<ExtendedUser> users = q.getResultList();
-
         perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
 
         assertTrue(users.size() > 0);
@@ -95,17 +91,10 @@ public class TestJPA extends BaseTest implements ITests {
         });
 
         log.info("USERS: " + users.size() + " VOTES: " + votes + " BADGES: " + badges + " POSTS: " + posts);
-
     }
 
     @Test
-    public void testFetchComments() {
-        perfStart();
-        perfEnd(Category.Other, "todo");
-    }
-
-    @Test
-    public void testPostsQuery() throws Exception {
+    public void testPosts() throws Exception {
         perfStart();
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
@@ -120,9 +109,10 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testFetchPost() {
+    public void testPost() {
         perfStart();
-        Query q = entityManager.createQuery("SELECT p FROM Post p JOIN FETCH Comment c on p.id = c.postId WHERE p.id = 4435775");
+        Query q = entityManager.createQuery("SELECT p FROM Post p WHERE p.id = ?1");
+        q.setParameter(1, 4435775);
         Post post = (Post) q.getSingleResult();
         perfEnd(Category.Result, "testFetchPost");
 
@@ -130,21 +120,15 @@ public class TestJPA extends BaseTest implements ITests {
         assertNotNull(post.getUser());
         assertNotNull(post.getPostType());
         assertEquals("comment count in db? 92?", 92, post.getCommentCount());
-        assertEquals("comment count?", 92, post.getComments().size());
+        assertEquals("comment count?", 42, post.getComments().size()); // 92 is all comments - 42 is user comments
     }
 
     @Test
     public void testQueryAllBadges() throws Exception {
         perfStart();
-
         Query q = entityManager.createNativeQuery("SELECT * FROM Badges");
         List<Badge> badges = q.getResultList();
-
         perfEnd(Category.Result, "badges size: " + badges.size());
     }
 
-    @Test
-    public void testQueryAllBadgesRecord() throws Exception {
-
-    }
 }

@@ -13,12 +13,10 @@ import net.sf.persism.Session;
 import net.sf.persism.perf.Category;
 import net.sf.persism.perf.PerfTest;
 
+import javax.swing.plaf.synth.Region;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DashboardApplication extends Application {
@@ -28,9 +26,9 @@ public class DashboardApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 1050, 600);
         DashboardController controller = fxmlLoader.getController();
         Session session = new Session(DashboardApplication.getConnection());
-        List<PerfTest> list = session.query(PerfTest.class);
+        List<PerfTest> list = session.query(PerfTest.class).stream().sorted(Comparator.comparing(PerfTest::getTestMethod)).toList();
 
-        Set<String> testNames = list.stream().map(PerfTest::getTestMethod).collect(Collectors.toSet());
+        Set<String> testNames = list.stream().map(PerfTest::getTestMethod).collect(Collectors.toCollection(LinkedHashSet::new));
 
         for (String testName : testNames) {
             createChart(testName, controller, list);
@@ -55,7 +53,8 @@ public class DashboardApplication extends Application {
 
         List<PerfTest> result = list.stream().
                 filter(p -> p.getCategory() == Category.Result && testName.equals(p.getTestMethod())).
-                sorted(Comparator.comparing(PerfTest::getTestClass)).toList();
+                sorted(Comparator.comparing(PerfTest::getTestClass)).
+                toList();
 
         for (PerfTest perfTest : result) {
             var series = new XYChart.Series<String, Number>();

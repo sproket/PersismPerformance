@@ -46,6 +46,8 @@ public class TestPersism extends BaseTest implements ITests {
         perfStart();
         con = getConnection();
         session = new Session(con);
+        session.fetch(ExtendedUser.class, params(-1));
+//        session.fetch(ExtendedUser.class, params(4918));
         perfEnd(Category.Setup, "SETUP: get Connection and Session");
     }
 
@@ -63,9 +65,7 @@ public class TestPersism extends BaseTest implements ITests {
     @Test
     public void testExtendedUser() {
         perfStart();
-
         ExtendedUser user = session.fetch(ExtendedUser.class, params(4918));
-
         perfEnd(Category.Result, "testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
         assertNotNull(user);
@@ -78,7 +78,6 @@ public class TestPersism extends BaseTest implements ITests {
     public void testExtendedUsers() {
         perfStart();
         List<ExtendedUser> users = session.query(ExtendedUser.class, where("Id < 1000"));
-
         perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
 
         assertTrue(users.size() > 0);
@@ -108,7 +107,7 @@ public class TestPersism extends BaseTest implements ITests {
 
 
     @Test
-    public void testPostsQuery() throws Exception {
+    public void testPosts() throws Exception {
         perfStart();
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
@@ -121,50 +120,8 @@ public class TestPersism extends BaseTest implements ITests {
         perfEnd(Category.Result, "testPosts size: " + posts.size());
     }
 
-//    @Test
-//    public void testAllFullAutoUsers() {
-//        reset();
-//        List<ExtendedUser> fullAutoUsers = session.query(ExtendedUser.class, where(":id < 1000"));
-//        out("time to q");
-//
-//        long posts = fullAutoUsers.stream()
-//                .map(ExtendedUser::getPosts)
-//                .mapToLong(Collection::size)
-//                .sum();
-//        out("tiome to stream posts");
-//
-//        long votes = fullAutoUsers.stream()
-//                .map(ExtendedUser::getVotes)
-//                .mapToLong(Collection::size)
-//                .sum();
-//
-//        out("tiome to stream votes");
-//
-//        System.out.println("full auto users count: " + fullAutoUsers.size() + " posts: " + posts + " votes: " + votes);
-//
-//        //.collect(Collectors.toList());
-//
-//        assertNotNull(fullAutoUsers.get(0).getPosts().get(0).getUser());
-//
-//        out("TIME?");
-//    }
-
     @Test
-    public void testFetchComments() {
-        perfStart();
-
-        // 297267
-        //2677740
-        //61
-        List<UserCommentXref> userCommentXrefs = session.query(UserCommentXref.class, where(":userId = ? and :postId = ?"), params(297267, 2677740));
-        assertNotNull(userCommentXrefs);
-        assertEquals(61, userCommentXrefs.size());
-
-        perfEnd(Category.Result, "testFetchComments");
-    }
-
-    @Test
-    public void testFetchPost() {
+    public void testPost() {
 
         perfStart();
         Post post = session.fetch(Post.class, params(4435775));
@@ -183,41 +140,6 @@ public class TestPersism extends BaseTest implements ITests {
         perfStart();
         List<Badge> badges = session.query(Badge.class, sql("select * from Badges"));
         perfEnd(Category.Result, "badges size: " + badges.size());
-
-    }
-
-    @Test
-    public void testQueryAllBadgesRecord() throws Exception {
-        perfStart();
-        List<BadgeRec> BadgeRec = session.query(BadgeRec.class, sql("select * from Badges"));
-        perfEnd(Category.Result, "badges rec size: " + BadgeRec.size());
-    }
-
-    //@Test
-    public void testRecordInstanceTiming() throws Exception {
-        Badge badge;
-        BadgeRec badgeRec;
-
-        long now = System.nanoTime();
-        badge = Badge.class.getDeclaredConstructor().newInstance();
-        System.out.println("object " + (System.nanoTime() - now));
-        System.out.println(badge);
-
-        now = System.nanoTime();
-        Class<?>[] ctypes = {Integer.class, String.class, Integer.class, Timestamp.class};
-        badgeRec = BadgeRec.class.getConstructor(ctypes).newInstance(1, "t1", 2, new Timestamp(System.currentTimeMillis()));
-        System.out.println("record " + (System.nanoTime() - now));
-        System.out.println(badgeRec);
-
-        now = System.nanoTime();
-        badge = Badge.class.getDeclaredConstructor().newInstance();
-        System.out.println("object " + (System.nanoTime() - now));
-        System.out.println(badge);
-
-        now = System.nanoTime();
-        badgeRec = BadgeRec.class.getConstructor(ctypes).newInstance(1, "t2", 2, new Timestamp(System.currentTimeMillis()));
-        System.out.println("record " + (System.nanoTime() - now));
-        System.out.println(badgeRec);
     }
 
     public void testQueries() {

@@ -10,6 +10,18 @@ public final class Comment {
     private String text;
     private Integer userId;
 
+    public Comment() {
+    }
+
+    public Comment(Integer id, Timestamp creationDate, Integer postId, Integer score, String text, Integer userId) {
+        this.id = id;
+        this.creationDate = creationDate;
+        this.postId = postId;
+        this.score = score;
+        this.text = text;
+        this.userId = userId;
+    }
+
     public Integer getId() {
         return id;
     }
