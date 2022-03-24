@@ -42,6 +42,14 @@ public class LeaderboardController implements Initializable {
                     tblResults.getItems().addAll(results);
                 }
             });
+
+            service.setOnCancelled(workerStateEvent -> {
+                System.out.println("cancelled?");
+            });
+
+            service.setOnFailed(workerStateEvent -> {
+                System.out.println("failed? " + workerStateEvent);
+            });
             service.start();
 
             cbFilter.setItems(FXCollections.observableList(Arrays.asList(Category.values())));

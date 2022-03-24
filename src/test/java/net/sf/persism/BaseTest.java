@@ -116,8 +116,8 @@ public abstract class BaseTest {
         Throwable t = new Throwable("out");
         endLine = t.getStackTrace()[1].getLineNumber();
 
-        String outText = "" + text; // "TIME:  " + newNan + " (" + newMil + ") " +
-        System.out.println(outText);
+        String outText = "" + text;
+        System.out.println(outText + " TIME:  " + newNan + " (" + newMil + ") ");
         PerfTest perfTest;
         perfTest = new PerfTest();
         perfTest.setCategory(category);

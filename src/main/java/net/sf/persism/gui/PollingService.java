@@ -46,7 +46,12 @@ public class PollingService extends ScheduledService<List<PerfTest>> {
             @Override
             protected void succeeded() {
                 super.succeeded();
-                //System.out.println("notify ! " + list.size());
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                System.out.println("Failed for some reason!");
             }
         };
     }

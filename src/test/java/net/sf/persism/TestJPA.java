@@ -42,8 +42,8 @@ public class TestJPA extends BaseTest implements ITests {
         perfStart();
         entityManagerFactory = Persistence.createEntityManagerFactory("persism_perf");
         entityManager = entityManagerFactory.createEntityManager();
-        var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = -1");
-        q.getSingleResult();
+//        var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = 4918");
+//        q.getSingleResult();
         perfEnd(Category.Setup, "SETUP: get entityManager");
     }
 

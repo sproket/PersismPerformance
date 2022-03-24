@@ -16,6 +16,9 @@ import org.junit.runners.Suite;
         TestPersism.class,
         TestJDBC.class,
         TestJPA.class,
+        TestPersism.class,
+        TestJDBC.class,
+        TestJPA.class,
 })
 public class AllTests {
 }

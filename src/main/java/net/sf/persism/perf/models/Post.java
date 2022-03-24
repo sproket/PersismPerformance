@@ -1,7 +1,6 @@
 package net.sf.persism.perf.models;
 
 import net.sf.persism.annotations.Join;
-import net.sf.persism.annotations.NotColumn;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -30,13 +29,13 @@ public final class Post {
     private String title;
     private int viewCount;
 
-    // infinite loop if you FullAutoUser here. We can't have repeating classes
+    // infinite loop if you have ExtendedUser here
     @Join(to = User.class, onProperties = "ownerUserId", toProperties = "id")
     private User user;
 
-    @Join(to=Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
+    // Test for multi-column joins
+    @Join(to = Comment.class, onProperties = "id, ownerUserId", toProperties = "postId, userId")
     private List<Comment> comments = new ArrayList<>();
-    // add 2nd join myComments and allComments?
 
     @Join(to = PostType.class, onProperties = "postTypeId", toProperties = "id")
     private PostType postType;

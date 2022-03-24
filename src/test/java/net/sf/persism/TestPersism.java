@@ -46,8 +46,8 @@ public class TestPersism extends BaseTest implements ITests {
         perfStart();
         con = getConnection();
         session = new Session(con);
-        session.fetch(ExtendedUser.class, params(-1));
-//        session.fetch(ExtendedUser.class, params(4918));
+        //session.fetch(ExtendedUser.class, params(-1));
+        //session.fetch(ExtendedUser.class, params(4918));
         perfEnd(Category.Setup, "SETUP: get Connection and Session");
     }
 
