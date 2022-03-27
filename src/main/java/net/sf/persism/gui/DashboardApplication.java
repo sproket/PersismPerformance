@@ -1,25 +1,41 @@
 package net.sf.persism.gui;
 
 import javafx.application.Application;
-import javafx.collections.ObservableList;
+import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
+import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
 import net.sf.persism.Session;
 import net.sf.persism.perf.Category;
 import net.sf.persism.perf.PerfTest;
 
-import javax.swing.plaf.synth.Region;
+import javax.imageio.ImageIO;
+import java.awt.image.RenderedImage;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DashboardApplication extends Application {
+
+    private Properties settings;
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        settings = new Properties();
+        try (InputStream in = getClass().getResourceAsStream("/settings.properties")) {
+            settings.load(in);
+        } catch (Exception e) {
+            System.out.println("no settings");
+        }
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(DashboardApplication.class.getResource("/gui/dashboard.fxml"));
@@ -40,7 +56,7 @@ public class DashboardApplication extends Application {
         stage.show();
     }
 
-    private void createChart(String testName, DashboardController controller, List<PerfTest> list) {
+    private void createChart(String testName, DashboardController controller, List<PerfTest> list) throws IOException {
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setTickLength(0);
 
@@ -49,6 +65,7 @@ public class DashboardApplication extends Application {
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setStyle("-fx-padding: 0;");
         lineChart.setLegendVisible(false);
+        lineChart.setAnimated(false);
         lineChart.setTitle(testName);
 
         List<PerfTest> result = list.stream().
@@ -65,22 +82,30 @@ public class DashboardApplication extends Application {
             lineChart.getData().add(series);
         }
         controller.resultCharts.getChildren().add(lineChart);
+
+        if (settings.getProperty("image.path") != null) {
+            Platform.runLater(() -> {
+                writeNodeToImage(lineChart, 500, 400, settings.getProperty("image.path") + testName + ".png");
+            });
+        }
+    }
+
+    private void writeNodeToImage(Node node, int width, int height, String fileName)  {
+        Chart chart = (Chart) node;
+        System.out.println(chart.getWidth() + " " + chart.getHeight());
+        WritableImage writableImage = new WritableImage(width, height);
+        node.snapshot(null, writableImage);
+        RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+        //Write the snapshot to the chosen file
+        try {
+            ImageIO.write(renderedImage, "png", new File(fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
         Application.launch();
-    }
-
-    private XYChart.Series createSeries(String name) {
-        XYChart.Series series = new XYChart.Series();
-        series.setName(name);
-        final ObservableList data = series.getData();
-//        final DataGenerator generator = new DataGenerator();
-//        for (String month: MONTHS) {
-//            data.add(generator.createDataItem(month));
-//        }
-
-        return series;
     }
 
     static Connection getConnection() throws Exception {

@@ -63,10 +63,10 @@ public class TestPersism extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUser() {
+    public void testSingleUser() {
         perfStart();
         ExtendedUser user = session.fetch(ExtendedUser.class, params(4918));
-        perfEnd(Category.Result, "testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
+        perfEnd(Category.Result, "votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
         assertNotNull(user);
         assertTrue(user.getVotes().size() > 0);
@@ -75,10 +75,10 @@ public class TestPersism extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUsers() {
+    public void testMultipleUsers() {
         perfStart();
         List<ExtendedUser> users = session.query(ExtendedUser.class, where("Id < 1000"));
-        perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
+        perfEnd(Category.Result, "users: " + users.size());
 
         assertTrue(users.size() > 0);
         ExtendedUser user = users.get(4);
@@ -107,7 +107,7 @@ public class TestPersism extends BaseTest implements ITests {
 
 
     @Test
-    public void testPosts() throws Exception {
+    public void testMultiplePosts() throws Exception {
         perfStart();
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
@@ -121,11 +121,11 @@ public class TestPersism extends BaseTest implements ITests {
     }
 
     @Test
-    public void testPost() {
+    public void testSinglePost() {
 
         perfStart();
         Post post = session.fetch(Post.class, params(4435775));
-        perfEnd(Category.Result, "testFetchPost");
+        perfEnd(Category.Result, getCurrentMethodName());
 
         assertNotNull(post);
         assertNotNull(post.getUser());

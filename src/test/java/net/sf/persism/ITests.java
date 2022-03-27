@@ -2,13 +2,13 @@ package net.sf.persism;
 
 public interface ITests {
 
-    void testExtendedUser() throws Exception;
+    void testSingleUser() throws Exception;
 
-    void testExtendedUsers() throws Exception;
+    void testMultipleUsers() throws Exception;
 
-    void testPost() throws Exception;
+    void testSinglePost() throws Exception;
 
-    void testPosts() throws Exception;
+    void testMultiplePosts() throws Exception;
 
     void testQueryAllBadges() throws Exception;
 }

@@ -56,11 +56,11 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUser() {
+    public void testSingleUser() {
         perfStart();
         var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id = 4918");
         ExtendedUser user = (ExtendedUser) q.getSingleResult();
-        perfEnd(Category.Result, "testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
+        perfEnd(Category.Result, getCurrentMethodName() + ": votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
         assertNotNull(user);
         assertTrue(user.getVotes().size() > 0);
@@ -69,11 +69,11 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUsers() {
+    public void testMultipleUsers() {
         perfStart();
         var q = entityManager.createQuery("SELECT u FROM ExtendedUser u WHERE u.id < 1000");
         List<ExtendedUser> users = q.getResultList();
-        perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
+        perfEnd(Category.Result, getCurrentMethodName() + ": users: " + users.size());
 
         assertTrue(users.size() > 0);
         ExtendedUser user = users.get(10);
@@ -94,7 +94,7 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testPosts() throws Exception {
+    public void testMultiplePosts() throws Exception {
         perfStart();
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
@@ -109,12 +109,12 @@ public class TestJPA extends BaseTest implements ITests {
     }
 
     @Test
-    public void testPost() {
+    public void testSinglePost() {
         perfStart();
         Query q = entityManager.createQuery("SELECT p FROM Post p WHERE p.id = ?1");
         q.setParameter(1, 4435775);
         Post post = (Post) q.getSingleResult();
-        perfEnd(Category.Result, "testFetchPost");
+        perfEnd(Category.Result, getCurrentMethodName());
 
         assertNotNull(post);
         assertNotNull(post.getUser());

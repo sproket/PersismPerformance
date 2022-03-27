@@ -57,7 +57,7 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testPosts() throws Exception {
+    public void testMultiplePosts() throws Exception {
         perfStart();
         String sql = """
                     SELECT [Id], [AcceptedAnswerId], [AnswerCount], [Body], [ClosedDate], 
@@ -102,7 +102,7 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUser() throws Exception {
+    public void testSingleUser() throws Exception {
         int userId = 4918;
 
         perfStart();
@@ -218,7 +218,7 @@ public class TestJDBC extends BaseTest implements ITests {
                 fail("no results");
             }
 
-            perfEnd(Category.Result, "testExtendedUser: votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
+            perfEnd(Category.Result, "votes: " + user.getVotes().size() + " posts: " + user.getPosts().size() + " badges: " + user.getBadges().size());
 
             assertNotNull(user);
             assertTrue(user.getVotes().size() > 0);
@@ -232,7 +232,7 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testExtendedUsers() throws Exception {
+    public void testMultipleUsers() throws Exception {
 
         perfStart();
         List<ExtendedUser> users = new ArrayList<>();
@@ -415,9 +415,7 @@ public class TestJDBC extends BaseTest implements ITests {
             parent.getBadges().add(badge);
         }
         perfEnd(Other, "stitch 4");
-
-
-        perfEnd(Category.Result, "testExtendedUsers: users: " + users.size());
+        perfEnd(Category.Result, "users: " + users.size());
 
         assertTrue(users.size() > 0);
         ExtendedUser user = users.get(10);
@@ -429,7 +427,7 @@ public class TestJDBC extends BaseTest implements ITests {
     }
 
     @Test
-    public void testPost() throws Exception {
+    public void testSinglePost() throws Exception {
         perfStart();
         Post post = null;
         PreparedStatement st = con.prepareStatement("SELECT * FROM Posts WHERE ID=?");
@@ -510,7 +508,7 @@ public class TestJDBC extends BaseTest implements ITests {
             }
 
         }
-        perfEnd(Category.Result, "testFetchPost");
+        perfEnd(Category.Result, getCurrentMethodName());
 
         assertNotNull(post);
         assertNotNull(post.getUser());

@@ -71,7 +71,7 @@ public abstract class BaseTest {
         }
     }
 
-    Connection getConnection() throws Exception {
+    final Connection getConnection() throws Exception {
         Properties props = new Properties();
         props.load(getClass().getResourceAsStream("/datasource.properties"));
         Class.forName(props.getProperty("database.driver"));
@@ -103,13 +103,17 @@ public abstract class BaseTest {
     }
 
 
-    void perfStart() {
+    final String getCurrentMethodName() {
+        return new Throwable().getStackTrace()[1].getMethodName();
+    }
+
+    final void perfStart() {
         Throwable t = new Throwable("reset");
         startLine = t.getStackTrace()[1].getLineNumber();
         now = System.nanoTime();
     }
 
-    void perfEnd(Category category, Object text) {
+    final void perfEnd(Category category, Object text) {
         long newNan = (System.nanoTime() - now);
         long newMil = newNan / 1_000_000;
 
